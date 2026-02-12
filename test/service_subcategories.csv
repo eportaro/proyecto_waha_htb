@@ -1,0 +1,199 @@
+﻿service_id,service_name,service_status,subcategory_id,subcategory_name,subcategory_status,request_type
+28,Aplicaciones (Software),production,280,"Creación, modificación o baja de cuenta",production,service_request
+28,Aplicaciones (Software),production,282,Instalación o desinstalación de aplicación,production,service_request
+28,Aplicaciones (Software),production,276,Problemas con aplicaciones,production,incident
+28,Aplicaciones (Software),production,281,Recuperación de cuenta,production,incident
+29,Equipos (Hardware),production,277,Problemas con equipos,production,incident
+29,Equipos (Hardware),production,283,Solicitud de equipo,production,service_request
+22,Gestión de Incidencias,obsolete,266,Creación de Incidencia,obsolete,incident
+5,Inc. Almacenamiento y Copias de seguridad,obsolete,36,Almacenamiento,obsolete,incident
+5,Inc. Almacenamiento y Copias de seguridad,obsolete,35,Backup y Restore,obsolete,incident
+11,Inc. App Bussiness Inteligence,obsolete,42,BI Comercial,obsolete,incident
+11,Inc. App Bussiness Inteligence,obsolete,43,BI Finanzas,obsolete,incident
+11,Inc. App Bussiness Inteligence,obsolete,44,BI Operaciones,obsolete,incident
+11,Inc. App Bussiness Inteligence,obsolete,45,BI Planillas,obsolete,incident
+11,Inc. App Bussiness Inteligence,obsolete,46,BI Procesamiento,obsolete,incident
+11,Inc. App Bussiness Inteligence,obsolete,47,BI Traslado,obsolete,incident
+13,Inc. App de Oficina,obsolete,52,Erwin,obsolete,incident
+13,Inc. App de Oficina,obsolete,51,Offices 365,obsolete,incident
+13,Inc. App de Oficina,obsolete,255,Otros,obsolete,incident
+13,Inc. App de Oficina,obsolete,55,Reproductor de video,obsolete,incident
+13,Inc. App de Oficina,obsolete,53,Start UML,obsolete,incident
+13,Inc. App de Oficina,obsolete,54,Visio,obsolete,incident
+13,Inc. App de Oficina,obsolete,56,Zoom,obsolete,incident
+9,Inc. App Distribución Valores,obsolete,85,ATM,obsolete,incident
+9,Inc. App Distribución Valores,obsolete,92,Beta,obsolete,incident
+9,Inc. App Distribución Valores,obsolete,86,Cash Management,obsolete,incident
+9,Inc. App Distribución Valores,obsolete,159,Cencon,obsolete,incident
+9,Inc. App Distribución Valores,obsolete,87,Claves ATM,obsolete,incident
+9,Inc. App Distribución Valores,obsolete,88,Cofres,obsolete,incident
+9,Inc. App Distribución Valores,obsolete,160,Control Acceso Seguro,obsolete,incident
+9,Inc. App Distribución Valores,obsolete,89,Control de blindado CIT,obsolete,incident
+9,Inc. App Distribución Valores,obsolete,161,Gestion de Licencias Digipass,obsolete,incident
+9,Inc. App Distribución Valores,obsolete,162,GPS,obsolete,incident
+9,Inc. App Distribución Valores,obsolete,90,Módulo Armeria,obsolete,incident
+9,Inc. App Distribución Valores,obsolete,163,Movimientos Sospechosos,obsolete,incident
+9,Inc. App Distribución Valores,obsolete,164,Nuevo Registro de Firmas Web,obsolete,incident
+9,Inc. App Distribución Valores,obsolete,165,Operaciones en Linea Valores,obsolete,incident
+9,Inc. App Distribución Valores,obsolete,264,Operaciones Web,obsolete,incident
+9,Inc. App Distribución Valores,obsolete,146,Planeación y programación de rutas - Beta,obsolete,incident
+9,Inc. App Distribución Valores,obsolete,147,Planeación y Programación de Rutas - Beta (Opciones: Gestión de Solicitudes y  Generación Hoja de Ruta),obsolete,incident
+9,Inc. App Distribución Valores,obsolete,166,SOTI Mobicontrol,obsolete,incident
+9,Inc. App Distribución Valores,obsolete,91,Sucave,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,169,Activos Fijos,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,170,Administración Web,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,171,Almacen,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,172,Auditoría,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,173,Beneficios,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,174,BPO GPI,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,175,BPO Web Cliente Externo,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,176,BPO Web Cliente Interno,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,177,Canales Cliente Interno,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,178,Canales on Line,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,179,Canales Web Cliente Externo,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,180,Clientes Documentos Web,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,181,Cobranzas,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,182,Comunicaciones,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,183,Consulta de clientes,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,184,Contabilidad,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,185,Contratos,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,186,Control Acceso Seguro,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,187,Control de sistemas,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,188,Control de sistemas antiguo,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,189,Control de versiones,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,190,Control M,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,191,Control Personal,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,192,Control Personal Sucursales,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,193,Costos,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,194,Cotizaciones,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,195,Custodia de Documentos Web,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,196,Distribucion de registro Firmas,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,197,Documentos Web,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,198,Exactus,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,199,Facturación Interface,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,200,Facturación Interoficinas,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,201,Facturación pendientes,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,202,Facturación Tarjetas,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,203,Facturación Valores,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,204,Facturación Web,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,205,Fractal,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,206,Gestión Ventas,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,207,Hermes Data DataEntry,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,208,Horas Extras operaciones,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,209,Inhuse en Línea,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,210,Inspecciones de seguridad,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,211,Intranet,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,212,Kofax,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,213,Mantenimiento de Flota,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,214,Marcaciones,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,215,Marcaciones on Line,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,216,Maximo Edificos y equipos,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,217,Maximo Máquina de Procesamiento,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,218,Maximo transportes,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,219,Mensajería Web,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,220,Nueva Página Web (hermesPeru),obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,221,Nueva Pagina web SmartSecurity,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,222,One File Solution (OFS),obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,223,Operaciones en Linea Mensajeria Nacional,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,224,Operaciones en Linea SIM,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,225,Oracle Discoverer,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,226,Pre orden,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,227,Procesos Facturación Web,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,228,Registro de documentos,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,229,Riesgos potenciales,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,230,RRHH,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,231,Seguridad,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,232,Servicio Atencion al Cliente,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,233,Servicio Integral Recaudación,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,248,Servicios Insolution,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,234,SIM Web Nuevo,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,235,Sistemas Administrativos Web,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,236,Sucave,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,237,Tarjetas,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,238,Tesorería,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,239,TopKat,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,240,Uniformes de personal,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,241,Universo Hermes,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,242,Vacaciones,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,243,Ventas Documentos Valorados,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,244,Ventas Domesa,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,245,Ventas Tarjeta,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,246,Ventas Valores,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,247,VentasWeb,obsolete,incident
+8,Inc. App Documentos y Administrativos,obsolete,249,Xplora Hermes,obsolete,incident
+19,Inc. App Hermeticase,obsolete,167,HermeticCase,obsolete,incident
+19,Inc. App Hermeticase,obsolete,168,Nuevo HermeticWeb,obsolete,incident
+19,Inc. App Hermeticase,obsolete,261,Operaciones Web,obsolete,incident
+19,Inc. App Hermeticase,obsolete,259,Proceso AEL,obsolete,incident
+19,Inc. App Hermeticase,obsolete,260,Proceso Generación CSH,obsolete,incident
+19,Inc. App Hermeticase,obsolete,263,Proceso Sincronización de Equipos,obsolete,incident
+19,Inc. App Hermeticase,obsolete,262,Shac12c,obsolete,incident
+10,Inc. App Procesamiento y Comercial,obsolete,72,Apertura y consolidación,obsolete,incident
+10,Inc. App Procesamiento y Comercial,obsolete,73,Bóveda,obsolete,incident
+10,Inc. App Procesamiento y Comercial,obsolete,74,Control Acceso libre,obsolete,incident
+10,Inc. App Procesamiento y Comercial,obsolete,75,Control Acceso seguro,obsolete,incident
+10,Inc. App Procesamiento y Comercial,obsolete,76,CS Web,obsolete,incident
+10,Inc. App Procesamiento y Comercial,obsolete,78,Gestión de ventas web,obsolete,incident
+10,Inc. App Procesamiento y Comercial,obsolete,79,Hermetic Web,obsolete,incident
+10,Inc. App Procesamiento y Comercial,obsolete,81,Joyas,obsolete,incident
+10,Inc. App Procesamiento y Comercial,obsolete,82,Módulo capacitación Web,obsolete,incident
+10,Inc. App Procesamiento y Comercial,obsolete,84,Nuevo comprobante de servicio web,obsolete,incident
+10,Inc. App Procesamiento y Comercial,obsolete,157,Productividad,obsolete,incident
+10,Inc. App Procesamiento y Comercial,obsolete,145,Reclamos y atenciones,obsolete,incident
+10,Inc. App Procesamiento y Comercial,obsolete,158,Servicio Atención al cliente,obsolete,incident
+10,Inc. App Procesamiento y Comercial,obsolete,156,Shac Escritorio,obsolete,incident
+10,Inc. App Procesamiento y Comercial,obsolete,152,Shac Web,obsolete,incident
+12,Inc. App TI,obsolete,48,Itop,obsolete,incident
+6,Inc. Comunicaciones y seguridad,obsolete,40,Conectividad,obsolete,incident
+6,Inc. Comunicaciones y seguridad,obsolete,38,Seguridad,obsolete,incident
+6,Inc. Comunicaciones y seguridad,obsolete,41,Telefonía,obsolete,incident
+20,Inc. Estación de trabajo,obsolete,257,Anexo,obsolete,incident
+20,Inc. Estación de trabajo,obsolete,250,Computadora,obsolete,incident
+20,Inc. Estación de trabajo,obsolete,252,Impresora,obsolete,incident
+20,Inc. Estación de trabajo,obsolete,251,Laptop,obsolete,incident
+4,Inc. Infraestructura Tecnológica,obsolete,151,Administración dispositivos móviles-SOTI,obsolete,incident
+4,Inc. Infraestructura Tecnológica,obsolete,19,Antispam,obsolete,incident
+4,Inc. Infraestructura Tecnológica,obsolete,18,Antivirus,obsolete,incident
+4,Inc. Infraestructura Tecnológica,obsolete,153,Aplicaciones 12c,obsolete,incident
+4,Inc. Infraestructura Tecnológica,obsolete,30,Aplicaciones 6i,obsolete,incident
+4,Inc. Infraestructura Tecnológica,obsolete,28,Aplicaciones Lima-RDS,obsolete,incident
+4,Inc. Infraestructura Tecnológica,obsolete,155,Aplicaciones móviles,obsolete,incident
+4,Inc. Infraestructura Tecnológica,obsolete,22,Aplicaciones Sucursales-Citrix,obsolete,incident
+4,Inc. Infraestructura Tecnológica,obsolete,154,Aplicaciones web,obsolete,incident
+4,Inc. Infraestructura Tecnológica,obsolete,25,Archivos compartidos,obsolete,incident
+4,Inc. Infraestructura Tecnológica,obsolete,20,Base de datos,obsolete,incident
+4,Inc. Infraestructura Tecnológica,obsolete,253,Certificados Digitales,obsolete,incident
+4,Inc. Infraestructura Tecnológica,obsolete,21,Correo electrónico,obsolete,incident
+4,Inc. Infraestructura Tecnológica,obsolete,23,Directorio Activo,obsolete,incident
+4,Inc. Infraestructura Tecnológica,obsolete,24,File server (DFS),obsolete,incident
+4,Inc. Infraestructura Tecnológica,obsolete,26,OFS,obsolete,incident
+4,Inc. Infraestructura Tecnológica,obsolete,27,Procesos automáticos,obsolete,incident
+4,Inc. Infraestructura Tecnológica,obsolete,34,Virtualización,obsolete,incident
+24,Infraestructura,production,284,Acceso físico a datacenter,production,service_request
+24,Infraestructura,production,285,Gestión de comunicaciones y Seguridad,production,service_request
+24,Infraestructura,production,278,Gestión de Infraestructura,production,service_request
+23,Reportes y aprobaciones,production,288,Backup de información,production,service_request
+23,Reportes y aprobaciones,production,279,Problemas con backups,production,incident
+23,Reportes y aprobaciones,production,286,Solicitud de aprobación,production,service_request
+23,Reportes y aprobaciones,production,287,Solicitud de reporte de información,production,service_request
+23,Reportes y aprobaciones,production,289,Solicitud de restauración de información,production,service_request
+14,Req. Permisos y accesos,obsolete,265,Acceso físico datacenter,obsolete,service_request
+14,Req. Permisos y accesos,obsolete,256,Desbloqueo Credenciales,obsolete,service_request
+14,Req. Permisos y accesos,obsolete,59,Eliminación de acceso,obsolete,service_request
+14,Req. Permisos y accesos,obsolete,58,Renovación de acceso,obsolete,service_request
+14,Req. Permisos y accesos,obsolete,258,Solicitud Acceso Estándar,obsolete,service_request
+14,Req. Permisos y accesos,obsolete,57,Solicitud de acceso,obsolete,service_request
+17,Req. Recursos Gestión de Información,obsolete,70,Aprobación de documento,obsolete,service_request
+17,Req. Recursos Gestión de Información,obsolete,149,Backup y Restore,obsolete,service_request
+17,Req. Recursos Gestión de Información,obsolete,150,Capacidad almacenamiento,obsolete,service_request
+17,Req. Recursos Gestión de Información,obsolete,71,Reporte de información,obsolete,service_request
+15,Req. Soporte Hardware,obsolete,61,Asignación de recurso informático,obsolete,service_request
+15,Req. Soporte Hardware,obsolete,148,Equipo audiovisual,obsolete,service_request
+15,Req. Soporte Hardware,obsolete,254,Equipo móvil,obsolete,service_request
+15,Req. Soporte Hardware,obsolete,62,Mantenimiento recurso informático,obsolete,service_request
+15,Req. Soporte Hardware,obsolete,60,Préstamo de recurso informático,obsolete,service_request
+15,Req. Soporte Hardware,obsolete,64,Recursos de impresión,obsolete,service_request
+15,Req. Soporte Hardware,obsolete,63,Traslado de recurso informático,obsolete,service_request
+16,Req. Soporte Software,obsolete,69,Actualización de software,obsolete,service_request
+16,Req. Soporte Software,obsolete,68,Desinstalación de software.,obsolete,service_request
+16,Req. Soporte Software,obsolete,67,Instalación/Configuración de software.,obsolete,service_request

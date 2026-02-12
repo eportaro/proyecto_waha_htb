@@ -1,0 +1,24 @@
+﻿service_id,service_name,service_friendlyname,service_status,org_id
+28,Aplicaciones (Software),Aplicaciones (Software),production,4
+29,Equipos (Hardware),Equipos (Hardware),production,4
+22,Gestión de Incidencias,Gestión de Incidencias,obsolete,4
+25,Gestión de Infraestructura,Gestión de Infraestructura,obsolete,4
+26,Hardware,Hardware,obsolete,4
+5,Inc. Almacenamiento y Copias de seguridad,Inc. Almacenamiento y Copias de seguridad,obsolete,4
+11,Inc. App Bussiness Inteligence,Inc. App Bussiness Inteligence,obsolete,4
+13,Inc. App de Oficina,Inc. App de Oficina,obsolete,4
+9,Inc. App Distribución Valores,Inc. App Distribución Valores,obsolete,4
+8,Inc. App Documentos y Administrativos,Inc. App Documentos y Administrativos,obsolete,4
+19,Inc. App Hermeticase,Inc. App Hermeticase,obsolete,4
+10,Inc. App Procesamiento y Comercial,Inc. App Procesamiento y Comercial,obsolete,4
+12,Inc. App TI,Inc. App TI,obsolete,4
+6,Inc. Comunicaciones y seguridad,Inc. Comunicaciones y seguridad,obsolete,4
+20,Inc. Estación de trabajo,Inc. Estación de trabajo,obsolete,4
+4,Inc. Infraestructura Tecnológica,Inc. Infraestructura Tecnológica,obsolete,4
+24,Infraestructura,Infraestructura,production,4
+23,Reportes y aprobaciones,Reportes y aprobaciones,production,4
+14,Req. Permisos y accesos,Req. Permisos y accesos,obsolete,4
+17,Req. Recursos Gestión de Información,Req. Recursos Gestión de Información,obsolete,4
+15,Req. Soporte Hardware,Req. Soporte Hardware,obsolete,4
+16,Req. Soporte Software,Req. Soporte Software,obsolete,4
+27,Software,Software,obsolete,4

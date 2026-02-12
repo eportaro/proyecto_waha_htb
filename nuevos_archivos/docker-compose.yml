@@ -1,0 +1,40 @@
+services:
+  waha:
+    image: devlikeapro/waha:latest
+    container_name: wpp-bot-waha-htb
+    restart: always
+    ports:
+      - "3000:3000"
+    shm_size: "2gb"
+    env_file:
+      - .env               # ← leerá WAHA_API_KEY si tu imagen lo usa
+    environment:
+      - WAHA_DASHBOARD_USERNAME=admin
+      - WAHA_DASHBOARD_PASSWORD=f6e75508bb61453f8bfc0fd2360eabb9
+      - WAHA_PRINT_QR=false
+      # Déjalo en el compose para no pelearte con comillas en .env
+      - WAHA_WEBHOOKS=[{"url":"http://api:5006/chatbot/webhook","events":["message"]}]
+    volumes:
+      - waha_data:/app/data
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: wpp-api-htb
+    restart: always
+    ports:
+      - "5006:5006"
+    env_file:
+      - .env               # ← trae GOOGLE_API_KEY, WAHA_URL, WAHA_SESSION, WAHA_API_KEY
+    environment:
+      # Puedes referenciar explícitamente por si quieres asegurar defaults
+      - WAHA_URL=${WAHA_URL}
+      - WAHA_API_KEY=${WAHA_API_KEY}
+      - WAHA_SESSION=${WAHA_SESSION}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+    depends_on:
+      - waha
+
+volumes:
+  waha_data:

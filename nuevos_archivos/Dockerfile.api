@@ -1,0 +1,24 @@
+FROM python:3.10-slim
+
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+# 1. instalar dependencias de sistema primero (incluye ffmpeg)
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+# 2. copiar requirements e instalarlos
+COPY requirements.txt requirements.txt
+RUN python -m pip install --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 3. copiar el código
+COPY . .
+
+ENV FLASK_APP=app.py
+
+EXPOSE 5006
+
+CMD ["flask", "run", "--host=0.0.0.0", "--port=5006", "--debug"]

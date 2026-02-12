@@ -1,0 +1,199 @@
+﻿subcategory_id,subcategory_name,subcategory_friendlyname,request_type,subcategory_status,service_id,service_friendlyname
+280,"Creación, modificación o baja de cuenta","Creación, modificación o baja de cuenta",service_request,production,28,Aplicaciones (Software)
+282,Instalación o desinstalación de aplicación,Instalación o desinstalación de aplicación,service_request,production,28,Aplicaciones (Software)
+276,Problemas con aplicaciones,Problemas con aplicaciones,incident,production,28,Aplicaciones (Software)
+281,Recuperación de cuenta,Recuperación de cuenta,incident,production,28,Aplicaciones (Software)
+277,Problemas con equipos,Problemas con equipos,incident,production,29,Equipos (Hardware)
+283,Solicitud de equipo,Solicitud de equipo,service_request,production,29,Equipos (Hardware)
+266,Creación de Incidencia,Creación de Incidencia,incident,obsolete,22,Gestión de Incidencias
+36,Almacenamiento,Almacenamiento,incident,obsolete,5,Inc. Almacenamiento y Copias de seguridad
+35,Backup y Restore,Backup y Restore,incident,obsolete,5,Inc. Almacenamiento y Copias de seguridad
+42,BI Comercial,BI Comercial,incident,obsolete,11,Inc. App Bussiness Inteligence
+43,BI Finanzas,BI Finanzas,incident,obsolete,11,Inc. App Bussiness Inteligence
+44,BI Operaciones,BI Operaciones,incident,obsolete,11,Inc. App Bussiness Inteligence
+45,BI Planillas,BI Planillas,incident,obsolete,11,Inc. App Bussiness Inteligence
+46,BI Procesamiento,BI Procesamiento,incident,obsolete,11,Inc. App Bussiness Inteligence
+47,BI Traslado,BI Traslado,incident,obsolete,11,Inc. App Bussiness Inteligence
+52,Erwin,Erwin,incident,obsolete,13,Inc. App de Oficina
+51,Offices 365,Offices 365,incident,obsolete,13,Inc. App de Oficina
+255,Otros,Otros,incident,obsolete,13,Inc. App de Oficina
+55,Reproductor de video,Reproductor de video,incident,obsolete,13,Inc. App de Oficina
+53,Start UML,Start UML,incident,obsolete,13,Inc. App de Oficina
+54,Visio,Visio,incident,obsolete,13,Inc. App de Oficina
+56,Zoom,Zoom,incident,obsolete,13,Inc. App de Oficina
+85,ATM,ATM,incident,obsolete,9,Inc. App Distribución Valores
+92,Beta,Beta,incident,obsolete,9,Inc. App Distribución Valores
+86,Cash Management,Cash Management,incident,obsolete,9,Inc. App Distribución Valores
+159,Cencon,Cencon,incident,obsolete,9,Inc. App Distribución Valores
+87,Claves ATM,Claves ATM,incident,obsolete,9,Inc. App Distribución Valores
+88,Cofres,Cofres,incident,obsolete,9,Inc. App Distribución Valores
+160,Control Acceso Seguro,Control Acceso Seguro,incident,obsolete,9,Inc. App Distribución Valores
+89,Control de blindado CIT,Control de blindado CIT,incident,obsolete,9,Inc. App Distribución Valores
+161,Gestion de Licencias Digipass,Gestion de Licencias Digipass,incident,obsolete,9,Inc. App Distribución Valores
+162,GPS,GPS,incident,obsolete,9,Inc. App Distribución Valores
+90,Módulo Armeria,Módulo Armeria,incident,obsolete,9,Inc. App Distribución Valores
+163,Movimientos Sospechosos,Movimientos Sospechosos,incident,obsolete,9,Inc. App Distribución Valores
+164,Nuevo Registro de Firmas Web,Nuevo Registro de Firmas Web,incident,obsolete,9,Inc. App Distribución Valores
+165,Operaciones en Linea Valores,Operaciones en Linea Valores,incident,obsolete,9,Inc. App Distribución Valores
+264,Operaciones Web,Operaciones Web,incident,obsolete,9,Inc. App Distribución Valores
+146,Planeación y programación de rutas - Beta,Planeación y programación de rutas - Beta,incident,obsolete,9,Inc. App Distribución Valores
+147,Planeación y Programación de Rutas - Beta (Opciones: Gestión de Solicitudes y  Generación Hoja de Ruta),Planeación y Programación de Rutas - Beta (Opciones: Gestión de Solicitudes y  Generación Hoja de Ruta),incident,obsolete,9,Inc. App Distribución Valores
+166,SOTI Mobicontrol,SOTI Mobicontrol,incident,obsolete,9,Inc. App Distribución Valores
+91,Sucave,Sucave,incident,obsolete,9,Inc. App Distribución Valores
+169,Activos Fijos,Activos Fijos,incident,obsolete,8,Inc. App Documentos y Administrativos
+170,Administración Web,Administración Web,incident,obsolete,8,Inc. App Documentos y Administrativos
+171,Almacen,Almacen,incident,obsolete,8,Inc. App Documentos y Administrativos
+172,Auditoría,Auditoría,incident,obsolete,8,Inc. App Documentos y Administrativos
+173,Beneficios,Beneficios,incident,obsolete,8,Inc. App Documentos y Administrativos
+174,BPO GPI,BPO GPI,incident,obsolete,8,Inc. App Documentos y Administrativos
+175,BPO Web Cliente Externo,BPO Web Cliente Externo,incident,obsolete,8,Inc. App Documentos y Administrativos
+176,BPO Web Cliente Interno,BPO Web Cliente Interno,incident,obsolete,8,Inc. App Documentos y Administrativos
+177,Canales Cliente Interno,Canales Cliente Interno,incident,obsolete,8,Inc. App Documentos y Administrativos
+178,Canales on Line,Canales on Line,incident,obsolete,8,Inc. App Documentos y Administrativos
+179,Canales Web Cliente Externo,Canales Web Cliente Externo,incident,obsolete,8,Inc. App Documentos y Administrativos
+180,Clientes Documentos Web,Clientes Documentos Web,incident,obsolete,8,Inc. App Documentos y Administrativos
+181,Cobranzas,Cobranzas,incident,obsolete,8,Inc. App Documentos y Administrativos
+182,Comunicaciones,Comunicaciones,incident,obsolete,8,Inc. App Documentos y Administrativos
+183,Consulta de clientes,Consulta de clientes,incident,obsolete,8,Inc. App Documentos y Administrativos
+184,Contabilidad,Contabilidad,incident,obsolete,8,Inc. App Documentos y Administrativos
+185,Contratos,Contratos,incident,obsolete,8,Inc. App Documentos y Administrativos
+186,Control Acceso Seguro,Control Acceso Seguro,incident,obsolete,8,Inc. App Documentos y Administrativos
+187,Control de sistemas,Control de sistemas,incident,obsolete,8,Inc. App Documentos y Administrativos
+188,Control de sistemas antiguo,Control de sistemas antiguo,incident,obsolete,8,Inc. App Documentos y Administrativos
+189,Control de versiones,Control de versiones,incident,obsolete,8,Inc. App Documentos y Administrativos
+190,Control M,Control M,incident,obsolete,8,Inc. App Documentos y Administrativos
+191,Control Personal,Control Personal,incident,obsolete,8,Inc. App Documentos y Administrativos
+192,Control Personal Sucursales,Control Personal Sucursales,incident,obsolete,8,Inc. App Documentos y Administrativos
+193,Costos,Costos,incident,obsolete,8,Inc. App Documentos y Administrativos
+194,Cotizaciones,Cotizaciones,incident,obsolete,8,Inc. App Documentos y Administrativos
+195,Custodia de Documentos Web,Custodia de Documentos Web,incident,obsolete,8,Inc. App Documentos y Administrativos
+196,Distribucion de registro Firmas,Distribucion de registro Firmas,incident,obsolete,8,Inc. App Documentos y Administrativos
+197,Documentos Web,Documentos Web,incident,obsolete,8,Inc. App Documentos y Administrativos
+198,Exactus,Exactus,incident,obsolete,8,Inc. App Documentos y Administrativos
+199,Facturación Interface,Facturación Interface,incident,obsolete,8,Inc. App Documentos y Administrativos
+200,Facturación Interoficinas,Facturación Interoficinas,incident,obsolete,8,Inc. App Documentos y Administrativos
+201,Facturación pendientes,Facturación pendientes,incident,obsolete,8,Inc. App Documentos y Administrativos
+202,Facturación Tarjetas,Facturación Tarjetas,incident,obsolete,8,Inc. App Documentos y Administrativos
+203,Facturación Valores,Facturación Valores,incident,obsolete,8,Inc. App Documentos y Administrativos
+204,Facturación Web,Facturación Web,incident,obsolete,8,Inc. App Documentos y Administrativos
+205,Fractal,Fractal,incident,obsolete,8,Inc. App Documentos y Administrativos
+206,Gestión Ventas,Gestión Ventas,incident,obsolete,8,Inc. App Documentos y Administrativos
+207,Hermes Data DataEntry,Hermes Data DataEntry,incident,obsolete,8,Inc. App Documentos y Administrativos
+208,Horas Extras operaciones,Horas Extras operaciones,incident,obsolete,8,Inc. App Documentos y Administrativos
+209,Inhuse en Línea,Inhuse en Línea,incident,obsolete,8,Inc. App Documentos y Administrativos
+210,Inspecciones de seguridad,Inspecciones de seguridad,incident,obsolete,8,Inc. App Documentos y Administrativos
+211,Intranet,Intranet,incident,obsolete,8,Inc. App Documentos y Administrativos
+212,Kofax,Kofax,incident,obsolete,8,Inc. App Documentos y Administrativos
+213,Mantenimiento de Flota,Mantenimiento de Flota,incident,obsolete,8,Inc. App Documentos y Administrativos
+214,Marcaciones,Marcaciones,incident,obsolete,8,Inc. App Documentos y Administrativos
+215,Marcaciones on Line,Marcaciones on Line,incident,obsolete,8,Inc. App Documentos y Administrativos
+216,Maximo Edificos y equipos,Maximo Edificos y equipos,incident,obsolete,8,Inc. App Documentos y Administrativos
+217,Maximo Máquina de Procesamiento,Maximo Máquina de Procesamiento,incident,obsolete,8,Inc. App Documentos y Administrativos
+218,Maximo transportes,Maximo transportes,incident,obsolete,8,Inc. App Documentos y Administrativos
+219,Mensajería Web,Mensajería Web,incident,obsolete,8,Inc. App Documentos y Administrativos
+220,Nueva Página Web (hermesPeru),Nueva Página Web (hermesPeru),incident,obsolete,8,Inc. App Documentos y Administrativos
+221,Nueva Pagina web SmartSecurity,Nueva Pagina web SmartSecurity,incident,obsolete,8,Inc. App Documentos y Administrativos
+222,One File Solution (OFS),One File Solution (OFS),incident,obsolete,8,Inc. App Documentos y Administrativos
+223,Operaciones en Linea Mensajeria Nacional,Operaciones en Linea Mensajeria Nacional,incident,obsolete,8,Inc. App Documentos y Administrativos
+224,Operaciones en Linea SIM,Operaciones en Linea SIM,incident,obsolete,8,Inc. App Documentos y Administrativos
+225,Oracle Discoverer,Oracle Discoverer,incident,obsolete,8,Inc. App Documentos y Administrativos
+226,Pre orden,Pre orden,incident,obsolete,8,Inc. App Documentos y Administrativos
+227,Procesos Facturación Web,Procesos Facturación Web,incident,obsolete,8,Inc. App Documentos y Administrativos
+228,Registro de documentos,Registro de documentos,incident,obsolete,8,Inc. App Documentos y Administrativos
+229,Riesgos potenciales,Riesgos potenciales,incident,obsolete,8,Inc. App Documentos y Administrativos
+230,RRHH,RRHH,incident,obsolete,8,Inc. App Documentos y Administrativos
+231,Seguridad,Seguridad,incident,obsolete,8,Inc. App Documentos y Administrativos
+232,Servicio Atencion al Cliente,Servicio Atencion al Cliente,incident,obsolete,8,Inc. App Documentos y Administrativos
+233,Servicio Integral Recaudación,Servicio Integral Recaudación,incident,obsolete,8,Inc. App Documentos y Administrativos
+248,Servicios Insolution,Servicios Insolution,incident,obsolete,8,Inc. App Documentos y Administrativos
+234,SIM Web Nuevo,SIM Web Nuevo,incident,obsolete,8,Inc. App Documentos y Administrativos
+235,Sistemas Administrativos Web,Sistemas Administrativos Web,incident,obsolete,8,Inc. App Documentos y Administrativos
+236,Sucave,Sucave,incident,obsolete,8,Inc. App Documentos y Administrativos
+237,Tarjetas,Tarjetas,incident,obsolete,8,Inc. App Documentos y Administrativos
+238,Tesorería,Tesorería,incident,obsolete,8,Inc. App Documentos y Administrativos
+239,TopKat,TopKat,incident,obsolete,8,Inc. App Documentos y Administrativos
+240,Uniformes de personal,Uniformes de personal,incident,obsolete,8,Inc. App Documentos y Administrativos
+241,Universo Hermes,Universo Hermes,incident,obsolete,8,Inc. App Documentos y Administrativos
+242,Vacaciones,Vacaciones,incident,obsolete,8,Inc. App Documentos y Administrativos
+243,Ventas Documentos Valorados,Ventas Documentos Valorados,incident,obsolete,8,Inc. App Documentos y Administrativos
+244,Ventas Domesa,Ventas Domesa,incident,obsolete,8,Inc. App Documentos y Administrativos
+245,Ventas Tarjeta,Ventas Tarjeta,incident,obsolete,8,Inc. App Documentos y Administrativos
+246,Ventas Valores,Ventas Valores,incident,obsolete,8,Inc. App Documentos y Administrativos
+247,VentasWeb,VentasWeb,incident,obsolete,8,Inc. App Documentos y Administrativos
+249,Xplora Hermes,Xplora Hermes,incident,obsolete,8,Inc. App Documentos y Administrativos
+167,HermeticCase,HermeticCase,incident,obsolete,19,Inc. App Hermeticase
+168,Nuevo HermeticWeb,Nuevo HermeticWeb,incident,obsolete,19,Inc. App Hermeticase
+261,Operaciones Web,Operaciones Web,incident,obsolete,19,Inc. App Hermeticase
+259,Proceso AEL,Proceso AEL,incident,obsolete,19,Inc. App Hermeticase
+260,Proceso Generación CSH,Proceso Generación CSH,incident,obsolete,19,Inc. App Hermeticase
+263,Proceso Sincronización de Equipos,Proceso Sincronización de Equipos,incident,obsolete,19,Inc. App Hermeticase
+262,Shac12c,Shac12c,incident,obsolete,19,Inc. App Hermeticase
+72,Apertura y consolidación,Apertura y consolidación,incident,obsolete,10,Inc. App Procesamiento y Comercial
+73,Bóveda,Bóveda,incident,obsolete,10,Inc. App Procesamiento y Comercial
+74,Control Acceso libre,Control Acceso libre,incident,obsolete,10,Inc. App Procesamiento y Comercial
+75,Control Acceso seguro,Control Acceso seguro,incident,obsolete,10,Inc. App Procesamiento y Comercial
+76,CS Web,CS Web,incident,obsolete,10,Inc. App Procesamiento y Comercial
+78,Gestión de ventas web,Gestión de ventas web,incident,obsolete,10,Inc. App Procesamiento y Comercial
+79,Hermetic Web,Hermetic Web,incident,obsolete,10,Inc. App Procesamiento y Comercial
+81,Joyas,Joyas,incident,obsolete,10,Inc. App Procesamiento y Comercial
+82,Módulo capacitación Web,Módulo capacitación Web,incident,obsolete,10,Inc. App Procesamiento y Comercial
+84,Nuevo comprobante de servicio web,Nuevo comprobante de servicio web,incident,obsolete,10,Inc. App Procesamiento y Comercial
+157,Productividad,Productividad,incident,obsolete,10,Inc. App Procesamiento y Comercial
+145,Reclamos y atenciones,Reclamos y atenciones,incident,obsolete,10,Inc. App Procesamiento y Comercial
+158,Servicio Atención al cliente,Servicio Atención al cliente,incident,obsolete,10,Inc. App Procesamiento y Comercial
+156,Shac Escritorio,Shac Escritorio,incident,obsolete,10,Inc. App Procesamiento y Comercial
+152,Shac Web,Shac Web,incident,obsolete,10,Inc. App Procesamiento y Comercial
+48,Itop,Itop,incident,obsolete,12,Inc. App TI
+40,Conectividad,Conectividad,incident,obsolete,6,Inc. Comunicaciones y seguridad
+38,Seguridad,Seguridad,incident,obsolete,6,Inc. Comunicaciones y seguridad
+41,Telefonía,Telefonía,incident,obsolete,6,Inc. Comunicaciones y seguridad
+257,Anexo,Anexo,incident,obsolete,20,Inc. Estación de trabajo
+250,Computadora,Computadora,incident,obsolete,20,Inc. Estación de trabajo
+252,Impresora,Impresora,incident,obsolete,20,Inc. Estación de trabajo
+251,Laptop,Laptop,incident,obsolete,20,Inc. Estación de trabajo
+151,Administración dispositivos móviles-SOTI,Administración dispositivos móviles-SOTI,incident,obsolete,4,Inc. Infraestructura Tecnológica
+19,Antispam,Antispam,incident,obsolete,4,Inc. Infraestructura Tecnológica
+18,Antivirus,Antivirus,incident,obsolete,4,Inc. Infraestructura Tecnológica
+153,Aplicaciones 12c,Aplicaciones 12c,incident,obsolete,4,Inc. Infraestructura Tecnológica
+30,Aplicaciones 6i,Aplicaciones 6i,incident,obsolete,4,Inc. Infraestructura Tecnológica
+28,Aplicaciones Lima-RDS,Aplicaciones Lima-RDS,incident,obsolete,4,Inc. Infraestructura Tecnológica
+155,Aplicaciones móviles,Aplicaciones móviles,incident,obsolete,4,Inc. Infraestructura Tecnológica
+22,Aplicaciones Sucursales-Citrix,Aplicaciones Sucursales-Citrix,incident,obsolete,4,Inc. Infraestructura Tecnológica
+154,Aplicaciones web,Aplicaciones web,incident,obsolete,4,Inc. Infraestructura Tecnológica
+25,Archivos compartidos,Archivos compartidos,incident,obsolete,4,Inc. Infraestructura Tecnológica
+20,Base de datos,Base de datos,incident,obsolete,4,Inc. Infraestructura Tecnológica
+253,Certificados Digitales,Certificados Digitales,incident,obsolete,4,Inc. Infraestructura Tecnológica
+21,Correo electrónico,Correo electrónico,incident,obsolete,4,Inc. Infraestructura Tecnológica
+23,Directorio Activo,Directorio Activo,incident,obsolete,4,Inc. Infraestructura Tecnológica
+24,File server (DFS),File server (DFS),incident,obsolete,4,Inc. Infraestructura Tecnológica
+26,OFS,OFS,incident,obsolete,4,Inc. Infraestructura Tecnológica
+27,Procesos automáticos,Procesos automáticos,incident,obsolete,4,Inc. Infraestructura Tecnológica
+34,Virtualización,Virtualización,incident,obsolete,4,Inc. Infraestructura Tecnológica
+284,Acceso físico a datacenter,Acceso físico a datacenter,service_request,production,24,Infraestructura
+285,Gestión de comunicaciones y Seguridad,Gestión de comunicaciones y Seguridad,service_request,production,24,Infraestructura
+278,Gestión de Infraestructura,Gestión de Infraestructura,service_request,production,24,Infraestructura
+288,Backup de información,Backup de información,service_request,production,23,Reportes y aprobaciones
+279,Problemas con backups,Problemas con backups,incident,production,23,Reportes y aprobaciones
+286,Solicitud de aprobación,Solicitud de aprobación,service_request,production,23,Reportes y aprobaciones
+287,Solicitud de reporte de información,Solicitud de reporte de información,service_request,production,23,Reportes y aprobaciones
+289,Solicitud de restauración de información,Solicitud de restauración de información,service_request,production,23,Reportes y aprobaciones
+265,Acceso físico datacenter,Acceso físico datacenter,service_request,obsolete,14,Req. Permisos y accesos
+256,Desbloqueo Credenciales,Desbloqueo Credenciales,service_request,obsolete,14,Req. Permisos y accesos
+59,Eliminación de acceso,Eliminación de acceso,service_request,obsolete,14,Req. Permisos y accesos
+58,Renovación de acceso,Renovación de acceso,service_request,obsolete,14,Req. Permisos y accesos
+258,Solicitud Acceso Estándar,Solicitud Acceso Estándar,service_request,obsolete,14,Req. Permisos y accesos
+57,Solicitud de acceso,Solicitud de acceso,service_request,obsolete,14,Req. Permisos y accesos
+70,Aprobación de documento,Aprobación de documento,service_request,obsolete,17,Req. Recursos Gestión de Información
+149,Backup y Restore,Backup y Restore,service_request,obsolete,17,Req. Recursos Gestión de Información
+150,Capacidad almacenamiento,Capacidad almacenamiento,service_request,obsolete,17,Req. Recursos Gestión de Información
+71,Reporte de información,Reporte de información,service_request,obsolete,17,Req. Recursos Gestión de Información
+61,Asignación de recurso informático,Asignación de recurso informático,service_request,obsolete,15,Req. Soporte Hardware
+148,Equipo audiovisual,Equipo audiovisual,service_request,obsolete,15,Req. Soporte Hardware
+254,Equipo móvil,Equipo móvil,service_request,obsolete,15,Req. Soporte Hardware
+62,Mantenimiento recurso informático,Mantenimiento recurso informático,service_request,obsolete,15,Req. Soporte Hardware
+60,Préstamo de recurso informático,Préstamo de recurso informático,service_request,obsolete,15,Req. Soporte Hardware
+64,Recursos de impresión,Recursos de impresión,service_request,obsolete,15,Req. Soporte Hardware
+63,Traslado de recurso informático,Traslado de recurso informático,service_request,obsolete,15,Req. Soporte Hardware
+69,Actualización de software,Actualización de software,service_request,obsolete,16,Req. Soporte Software
+68,Desinstalación de software.,Desinstalación de software.,service_request,obsolete,16,Req. Soporte Software
+67,Instalación/Configuración de software.,Instalación/Configuración de software.,service_request,obsolete,16,Req. Soporte Software
