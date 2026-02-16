@@ -63,7 +63,7 @@ class Database:
     # Esquema de payload
     # ─────────────────────────────────────────────────────────────
     def _build_payload(self, phone_number: str, session_data: Dict[str, Any]) -> Dict[str, Any]:
-        clean_phone = phone_number.replace("@c.us", "").replace("@s.whatsapp.net", "")
+        clean_phone = phone_number.replace("@c.us", "").replace("@s.whatsapp.net", "").replace("@lid", "")
 
         data = session_data.get("data", {}) or {}
         raw_answers = session_data.get("raw_answers", {}) or {}
@@ -97,7 +97,10 @@ class Database:
             "medio_captacion": data.get("medio_captacion"),
             "medio_captacion_otro": data.get("medio_captacion_otro"),
             "puesto_otros_detalle": data.get("puesto_otros_detalle"),
-            "horario_entrevista": data.get("horario_entrevista"),
+            # Reemplazamos horario_entrevista por fecha calculada
+            "horario_entrevista": data.get("horario_entrevista"), # Legacy
+            "fecha_entrevista": data.get("fecha_entrevista"),     # Nuevo: Timestamp calculado
+            "confirmacion_asistencia": data.get("confirmacion_asistencia"), # Nuevo: Bool
             "autorizacion_datos": data.get("autorizacion_datos"),
 
             # Metadatos y calculados
@@ -212,6 +215,44 @@ class Database:
             print(f"❌ Error obteniendo postulante: {e}", flush=True)
             return None
 
+    def get_count_for_date(self, date_iso: str) -> int:
+        """Cuenta postulantes confirmados para una fecha específica (YYYY-MM-DD)."""
+        try:
+            # Asumimos date_iso viene como "YYYY-MM-DD" o inicio de ISO
+            target_date = date_iso.split("T")[0]
+
+            if self.use_supabase and self.client is not None:
+                # En Supabase/Postgres filtramos por rango del día
+                start_dt = f"{target_date}T00:00:00"
+                end_dt = f"{target_date}T23:59:59"
+
+                res = (
+                    self.client.table("postulantes")
+                    .select("id", count="exact")
+                    .eq("confirmacion_asistencia", True)
+                    .gte("fecha_entrevista", start_dt)
+                    .lte("fecha_entrevista", end_dt)
+                    .execute()
+                )
+                return res.count if res.count is not None else 0
+
+            # Local
+            self._ensure_local_ready()
+            with open(self.local_file, "r", encoding="utf-8") as f:
+                rows: List[Dict[str, Any]] = json.load(f)
+
+            count = 0
+            for r in rows:
+                if r.get("confirmacion_asistencia") is True:
+                    fecha = r.get("fecha_entrevista")
+                    if fecha and fecha.startswith(target_date):
+                        count += 1
+            return count
+
+        except Exception as e:
+            print(f"❌ Error contando postulantes fecha {date_iso}: {e}", flush=True)
+            return 0
+
     def get_all_postulantes(self, limit: int = 100, es_apto: Optional[bool] = None) -> List[Dict[str, Any]]:
         try:
             if self.use_supabase and self.client is not None:
@@ -288,6 +329,8 @@ create table if not exists public.postulantes (
   es_apto boolean default false,
   respuestas_raw text,
   fecha_postulacion timestamptz,
+  fecha_entrevista timestamptz,
+  confirmacion_asistencia boolean,
   created_at timestamptz default now()
 );
 
