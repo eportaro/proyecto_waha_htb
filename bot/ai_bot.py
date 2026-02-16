@@ -4,6 +4,7 @@ from __future__ import annotations
 import os
 import re
 import unicodedata
+from difflib import get_close_matches
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
@@ -158,6 +159,37 @@ def _norm_text(s: str) -> str:
     s = unicodedata.normalize("NFD", s)
     s = "".join(ch for ch in s if unicodedata.category(ch) != "Mn")
     return s
+
+
+def _fuzzy_match(text: str, candidates: List[str], cutoff: float = 0.6) -> Optional[str]:
+    """
+    Intenta hacer match fuzzy del texto contra candidatos.
+    Retorna el mejor candidato o None si no hay match.
+    Primero intenta coincidencia por substring, luego por difflib.
+    """
+    tn = _norm_text(text)
+    if not tn:
+        return None
+    # 1) Coincidencia parcial por substring
+    for c in candidates:
+        cn = _norm_text(c)
+        if cn in tn or tn in cn:
+            return c
+    # 2) Fuzzy matching con difflib (tolera typos)
+    normalized_candidates = {_norm_text(c): c for c in candidates}
+    words = tn.split()
+    # Intentar con el texto completo primero
+    matches = get_close_matches(tn, normalized_candidates.keys(), n=1, cutoff=cutoff)
+    if matches:
+        return normalized_candidates[matches[0]]
+    # Intentar con cada palabra individual
+    for w in words:
+        if len(w) < 3:
+            continue
+        matches = get_close_matches(w, normalized_candidates.keys(), n=1, cutoff=cutoff)
+        if matches:
+            return normalized_candidates[matches[0]]
+    return None
 
 
 def _extract_int(s: str) -> Optional[int]:
@@ -542,7 +574,14 @@ class AIBot:
                 s["step"] += 1
                 return self._ask_next(s)
             
-            clarify = need_clarify_msg or "No entendí tu respuesta. ¿Podrías intentar de nuevo?"
+            # Construir mensaje de reprompt contextual
+            if need_clarify_msg:
+                clarify = need_clarify_msg
+            else:
+                # Re-mostrar la pregunta original con hint amigable
+                original_question = self._ask_next(s)
+                clarify = f"No pude interpretar tu respuesta. Intentemos de nuevo:\n\n{original_question}"
+            
             self._add_to_history(chat_id, "assistant", clarify)
             return clarify
 
@@ -752,16 +791,22 @@ class AIBot:
             return False, {}, "Ingresa una edad válida (número)."
 
         if key == "genero":
-            if "masculino" in tn or "hombre" in tn or tn == "m":
+            if "masculino" in tn or "hombre" in tn or "varon" in tn or tn == "m":
                 out["genero"] = "M"
                 return True, out, None
-            if "femenino" in tn or "mujer" in tn or tn == "f":
+            if "femenino" in tn or "mujer" in tn or "dama" in tn or tn == "f":
                 out["genero"] = "F"
                 return True, out, None
             if "otro" in tn or "prefiero" in tn:
                 out["genero"] = "O"
                 return True, out, None
-            return False, {}, "Elige: Masculino, Femenino u Otros."
+            # Fuzzy matching para typos
+            genero_map = {"masculino": "M", "femenino": "F", "otros": "O"}
+            fuzzy = _fuzzy_match(t, list(genero_map.keys()))
+            if fuzzy:
+                out["genero"] = genero_map[fuzzy]
+                return True, out, None
+            return False, {}, "No pude interpretar tu respuesta. Elige: Masculino, Femenino u Otros."
 
         if key == "tipo_documento":
             if "dni" in tn:
@@ -838,7 +883,19 @@ class AIBot:
             if "tiempo completo" in tn or "full" in tn: out["modalidad_trabajo"] = "tiempo_completo"; return True, out, None
             if "medio" in tn or "part" in tn: out["modalidad_trabajo"] = "medio_tiempo"; return True, out, None
             if "intermitente" in tn or "dias" in tn: out["modalidad_trabajo"] = "intermitente"; return True, out, None
-            return False, {}, "Elige una opción válida (1, 2 o 3)."
+            # Fuzzy matching para typos
+            modalidad_map = {
+                "tiempo completo": "tiempo_completo",
+                "medio tiempo": "medio_tiempo",
+                "intermitente": "intermitente",
+                "completo": "tiempo_completo",
+                "parcial": "medio_tiempo",
+            }
+            fuzzy = _fuzzy_match(t, list(modalidad_map.keys()))
+            if fuzzy:
+                out["modalidad_trabajo"] = modalidad_map[fuzzy]
+                return True, out, None
+            return False, {}, "No pude interpretar tu respuesta. Por favor responde con el número:\n1. Tiempo Completo\n2. Medio Tiempo\n3. Intermitente por días"
 
         if key == "distrito":
             out["distrito_residencia"] = t
@@ -995,8 +1052,15 @@ class AIBot:
         return False, {}, "No entendí tu respuesta."
 
     def _yes_no_soft(self, tn: str) -> Optional[bool]:
-        yes_markers = {"si", "sí", "sip", "claro", "yes", "correcto", "obvio"}
-        no_markers = {"no", "nop", "negativo", "nunca", "jamas"}
+        yes_markers = {
+            "si", "sí", "sip", "sep", "claro", "yes", "correcto", "obvio",
+            "acepto", "ok", "dale", "de una", "va", "afirmativo", "por supuesto",
+            "asi es", "efectivamente", "listo",
+        }
+        no_markers = {
+            "no", "nop", "nope", "nel", "nah", "negativo", "nunca", "jamas",
+            "para nada", "tampoco",
+        }
         if any(m in tn for m in yes_markers): return True
         if any(m in tn for m in no_markers): return False
         return None

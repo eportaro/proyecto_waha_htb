@@ -189,7 +189,12 @@ class GeminiClient:
 
             return None
         except Exception as e:
+            error_msg = str(e).lower()
             print(f"[Gemini Error] {e}", flush=True)
+            # Si la API key fue revocada/leaked, desactivar Gemini para no repetir calls
+            if "leaked" in error_msg or "403" in error_msg or "invalid api key" in error_msg:
+                print("[Gemini] API key inválida/revocada. Desactivando Gemini para esta sesión.", flush=True)
+                self.model = None
             return None
 
     # ─────────────────────────────────────────────────────────────
@@ -458,20 +463,30 @@ JSON ESPERADO:
     # Fallback determinista (sin IA) — con tono amable
     # ─────────────────────────────────────────────────────────────
     def _fallback_extraction(self, key: str, response: str, data: dict) -> dict:
-        r = response.lower().strip()
-        
-        # Implementación básica de fallback para no romper si no hay IA
-        # Reutiliza lógica de _validate_and_extract_soft de AIBot conceptualmente, 
-        # pero aquí solo devolvemos estructura compatible.
-        
-        # Por brevedad, si no hay IA, confiamos en que AIBot._validate_and_extract_soft 
-        # ya hizo el trabajo pesado antes de llamar a Gemini.
-        # Gemini se llama SOLO si el soft validation falló.
-        
+        """Fallback contextual cuando Gemini no está disponible."""
+        # Mensajes de reprompt específicos por pregunta
+        reprompt_messages = {
+            "genero": "Por favor responde: Masculino, Femenino u Otros.",
+            "tipo_documento": "Responde DNI o Carné de Extranjería.",
+            "numero_documento": "El DNI debe tener exactamente 8 dígitos.",
+            "telefono": "El teléfono debe tener exactamente 9 dígitos.",
+            "correo": "Ingresa un correo válido (ej. usuario@dominio.com).",
+            "secundaria": "¿Secundaria Completa o Incompleta?",
+            "trabajo_hermes": "¿Has trabajado en Hermes? (Sí / No)",
+            "modalidad": "Responde con el número:\n1. Tiempo Completo\n2. Medio Tiempo\n3. Intermitente por días",
+            "lugar_residencia": "¿Lima o Provincia?",
+            "licencia": "¿Tienes licencia de conducir? (Sí / No)",
+            "licencia_tipo": "Indica la categoría (A1, A2B, BII, etc.).",
+            "puesto": "Elige una opción del menú (responde con el número).",
+            "disponibilidad": "¿Disponibilidad inmediata? (Sí / No)",
+            "medio_captacion": "Responde con el número (1-9).",
+            "horario_entrevista": "Indica una hora entre 9am-1pm o 3pm-5pm (ej. 10:00 am).",
+        }
+        msg = reprompt_messages.get(key)
         return {
             "is_valid": False,
             "extracted_data": {},
-            "bot_response": None # Dejar que AIBot decida el mensaje de error
+            "bot_response": msg,
         }
 
     # ─────────────────────────────────────────────────────────────
@@ -507,8 +522,8 @@ JSON ESPERADO:
     def respuesta_conversacional(self, user_message: str, context: str, company_info: dict) -> str:
         if not self.model:
             return (
-                "¡Gracias por escribirnos! Tu información ya fue registrada. "
-                "Nuestro equipo se comunicará contigo a la brevedad."
+                "Gracias por escribirnos. Tu información ya fue registrada. "
+                "Nuestro equipo se comunicará contigo a la brevedad. 🙏"
             )
 
         prompt = f"""Eres un asistente de RRHH amable de {company_info.get('nombre','la empresa')}.
@@ -537,4 +552,7 @@ FORMATO DE RESPUESTA (JSON OBLIGATORIO):
             if data and "response" in data:
                 return data["response"]
         
-        return (result or "¡Gracias! Tu mensaje ha sido recibido.").strip()
+        return (
+            "Gracias por escribirnos. Tu información ya fue registrada. "
+            "Nuestro equipo se comunicará contigo a la brevedad. 🙏"
+        )
