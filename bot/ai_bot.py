@@ -4,13 +4,13 @@ from __future__ import annotations
 import os
 import re
 import unicodedata
-from difflib import get_close_matches
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
+from difflib import get_close_matches
 
-# ────────────────────────────────────────────────────────────────────────────────
+# --------------------------------------------------------------------------------
 # Imports flexibles para GeminiClient y Database
-# ────────────────────────────────────────────────────────────────────────────────
+# --------------------------------------------------------------------------------
 try:
     from .gemini_client import GeminiClient  # dentro de /bot
 except Exception:
@@ -27,9 +27,9 @@ except Exception:
     except Exception:
         Database = None  # fallback opcional
 
-# ────────────────────────────────────────────────────────────────────────────────
+# --------------------------------------------------------------------------------
 # Parámetros (ajustables por variables de entorno)
-# ────────────────────────────────────────────────────────────────────────────────
+# --------------------------------------------------------------------------------
 SESSION_TIMEOUT_MINUTES = int(os.getenv("SESSION_TIMEOUT_MINUTES", "60"))
 COOLDOWN_HOURS = int(os.getenv("COOLDOWN_HOURS", "24"))
 
@@ -46,8 +46,8 @@ PUESTOS: List[Dict[str, Any]] = [
     {"id": 9, "name": "Motorizados BII"},
     {"id": 10, "name": "Operarios de Limpieza"},
     {"id": 11, "name": "Despachadores"},
-    {"id": 12, "name": "Agentes de Seguridad - Minería Trujillo"},
-    {"id": 13, "name": "Supervisores Operativos - Minería Trujillo"},
+    {"id": 12, "name": "Agentes de Seguridad - Minería"},
+    {"id": 13, "name": "Supervisores Operativos - Minería"},
     {"id": 14, "name": "Técnico Electrónico"},
     {"id": 15, "name": "Mecánico Automotriz"},
     {"id": 16, "name": "Técnico Electricista"},
@@ -98,9 +98,9 @@ PUESTOS_KEYWORDS = {
     "provincia": 4,
 }
 
-# ────────────────────────────────────────────────────────────────────────────────
+# --------------------------------------------------------------------------------
 # Utilidades de menú de puestos e intención de inicio
-# ────────────────────────────────────────────────────────────────────────────────
+# --------------------------------------------------------------------------------
 def _build_puestos_menu_text(include_header: bool = True) -> str:
     """
     Construye el menú numerado de puestos (1–18) en texto plano.
@@ -138,6 +138,7 @@ def _detect_start_intent(text: str) -> bool:
         "quiero trabajar",
         "deseo trabajar",
         "quiero un trabajo",
+        "empesar",
     }
 
     if any(phrase in tn for phrase in start_phrases):
@@ -149,9 +150,9 @@ def _detect_start_intent(text: str) -> bool:
 
     return False
 
-# ────────────────────────────────────────────────────────────────────────────────
+# --------------------------------------------------------------------------------
 # Utilidades de normalización y heurísticas (secundarias)
-# ────────────────────────────────────────────────────────────────────────────────
+# --------------------------------------------------------------------------------
 def _norm_text(s: str) -> str:
     if not s:
         return ""
@@ -159,37 +160,6 @@ def _norm_text(s: str) -> str:
     s = unicodedata.normalize("NFD", s)
     s = "".join(ch for ch in s if unicodedata.category(ch) != "Mn")
     return s
-
-
-def _fuzzy_match(text: str, candidates: List[str], cutoff: float = 0.6) -> Optional[str]:
-    """
-    Intenta hacer match fuzzy del texto contra candidatos.
-    Retorna el mejor candidato o None si no hay match.
-    Primero intenta coincidencia por substring, luego por difflib.
-    """
-    tn = _norm_text(text)
-    if not tn:
-        return None
-    # 1) Coincidencia parcial por substring
-    for c in candidates:
-        cn = _norm_text(c)
-        if cn in tn or tn in cn:
-            return c
-    # 2) Fuzzy matching con difflib (tolera typos)
-    normalized_candidates = {_norm_text(c): c for c in candidates}
-    words = tn.split()
-    # Intentar con el texto completo primero
-    matches = get_close_matches(tn, normalized_candidates.keys(), n=1, cutoff=cutoff)
-    if matches:
-        return normalized_candidates[matches[0]]
-    # Intentar con cada palabra individual
-    for w in words:
-        if len(w) < 3:
-            continue
-        matches = get_close_matches(w, normalized_candidates.keys(), n=1, cutoff=cutoff)
-        if matches:
-            return normalized_candidates[matches[0]]
-    return None
 
 
 def _extract_int(s: str) -> Optional[int]:
@@ -273,9 +243,9 @@ def _puesto_from_text(s: str) -> Optional[Dict[str, Any]]:
     return None
 
 
-# ────────────────────────────────────────────────────────────────────────────────
+# --------------------------------------------------------------------------------
 # Clase principal (modelo híbrido: reglas primero, IA cuando se sale del carril)
-# ────────────────────────────────────────────────────────────────────────────────
+# --------------------------------------------------------------------------------
 class AIBot:
     """
     Bot conversacional para preselección de personal con enfoque híbrido:
@@ -316,13 +286,14 @@ class AIBot:
             "licencia_tipo",    # Solo si tiene
             "puesto",
             "puesto_otros",     # Solo si Puesto == Otros
+            "puesto_mineria_sucursal", # Nuevo: Solo si Puesto == 12 o 13
             "disponibilidad",
             "medio_captacion",
             "medio_captacion_otro", # Solo si Medio == Otros
-            "horario_entrevista",   # Solo si APTO
+            "confirmacion_entrevista",   # Nuevo: Solo si APTO, reemplaza a horario_entrevista
         ]
 
-    # ───────────── Gestión de sesiones ─────────────
+    # ------------- Gestión de sesiones -------------
     def _init_session(self, chat_id: str) -> None:
         self.sessions[chat_id] = {
             "step": 0,
@@ -338,7 +309,7 @@ class AIBot:
                 "licencia": None,
                 "licencia_cat": None,
                 "disponibilidad": None,
-                
+
                 # Nuevos campos
                 "nombres": None, # Temp
                 "apellidos": None, # Temp
@@ -356,6 +327,8 @@ class AIBot:
                 "medio_captacion_otro": None,
                 "puesto_otros_detalle": None,
                 "horario_entrevista": None,
+                "fecha_entrevista": None, # Nuevo
+                "confirmacion_asistencia": None, # Nuevo
                 "autorizacion_datos": None,
             },
             "raw_answers": {},
@@ -397,10 +370,10 @@ class AIBot:
         if len(hist) > 10:
             self.sessions[chat_id]["conversation_history"] = hist[-10:]
 
-    # ───────────── Núcleo de procesamiento ─────────────
+    # ------------- Núcleo de procesamiento -------------
     def process(self, chat_id: str, text: str) -> str:
         if not text or not text.strip():
-            return "¿Me puedes escribir tu consulta o respuesta? 😊"
+            return "¿Me puedes escribir tu consulta o respuesta? ??"
 
         text = text.strip()
         text_norm = _norm_text(text)
@@ -409,7 +382,7 @@ class AIBot:
         # Comandos globales
         if text_norm in {"ayuda", "help", "menu"}:
             return (
-                "🤖 *Comandos:*\n"
+                "?? *Comandos:*\n"
                 "• *empezar* — iniciar postulación\n"
                 "• *reiniciar* — reiniciar proceso\n"
                 "• *estado* — ver progreso"
@@ -421,9 +394,9 @@ class AIBot:
             if start_intent:
                 self.sessions[chat_id]["step"] = 1
                 return self._ask_next(self.sessions[chat_id]) # Pregunta 1: Nombre
-            
+
             return (
-                f"¡Hola! 👋 Soy el asistente virtual de *{self.company_info['nombre']}*.\n"
+                f"¡Hola! ?? Soy el asistente virtual de *{self.company_info['nombre']}*.\n"
                 "Para iniciar tu postulación, escribe *empezar* o *quiero postular*."
             )
 
@@ -441,10 +414,10 @@ class AIBot:
                     return self._ask_next(s)
                 hours_left = int(COOLDOWN_HOURS - (datetime.now() - s["completion_time"]).total_seconds() / 3600)
                 return f"Ya completaste tu postulación. Podrás volver a postular en {max(hours_left, 0)} horas."
-            
+
             if "estado" in text_norm:
                 return s.get("final_response") or "Tu postulación está registrada."
-            
+
             # Chat libre post-postulación
             if self.gemini:
                 # Construir contexto rico
@@ -458,18 +431,18 @@ class AIBot:
                         ctx_parts.append("Entrevista: Pendiente o no seleccionada.")
                 else:
                     ctx_parts.append("Estado: NO APTO (Registrado para futura consideración).")
-                
+
                 ctx_parts.append(f"Fecha postulación: {s.get('completion_time')}")
                 context_str = "\n".join(ctx_parts)
 
                 return self.gemini.respuesta_conversacional(text, context_str, self.company_info)
-            return "Gracias por tu interés. Ya tenemos tus datos registrados. 🙏"
+            return "Gracias por tu interés. Ya tenemos tus datos registrados. ??"
 
         # Estado durante sesión
         if text_norm == "estado":
             step = s["step"]
             total = len(self.questions_flow)
-            return f"📊 Progreso: paso {step} de {total} (aprox)."
+            return f"?? Progreso: paso {step} de {total} (aprox)."
 
         if text_norm.startswith("reiniciar"):
             self._reset_session(chat_id)
@@ -482,12 +455,12 @@ class AIBot:
             if start_intent:
                 s["step"] = 1
                 return self._ask_next(s)
-            
+
             if self.gemini:
                 return self.gemini.respuesta_conversacional(
                     text, "Invita al usuario a escribir 'empezar' para postular.", self.company_info
                 )
-            return "Escribe *empezar* para iniciar tu postulación. 😊"
+            return "Escribe *empezar* para iniciar tu postulación. ??"
 
         # Procesar respuesta actual
         current_key = self.questions_flow[s["step"] - 1]
@@ -521,7 +494,7 @@ class AIBot:
                 extra_context = ""
                 if current_key == "medio_captacion":
                     extra_context = "Opciones: tiktok, canal_whatsapp, correo, volante, qr, facebook, referido, instagram, otros"
-                
+
                 extraction = self.gemini.extract_and_validate(
                     question_key=current_key,
                     user_response=text,
@@ -534,10 +507,10 @@ class AIBot:
                     # Mapeo manual de campos extraídos por IA si es necesario
                     if "licencia_cat" in extraction["extracted_data"]:
                          normalized_data["licencia"] = True
-                    
-                    # ─────────────────────────────────────────────────────────────
+
+                    # -------------------------------------------------------------
                     # VALIDACIÓN POST-IA (Firewall contra alucinaciones)
-                    # ─────────────────────────────────────────────────────────────
+                    # -------------------------------------------------------------
                     # DNI Estricto
                     if "numero_documento" in normalized_data:
                         ndoc = normalized_data["numero_documento"]
@@ -545,19 +518,25 @@ class AIBot:
                         # Si es CE, permitimos más.
                         tipo = s["data"].get("tipo_documento") or normalized_data.get("tipo_documento")
                         if tipo != "ce":
-                            if len(ndoc) != 8:
+                            # FIX 1: Agregar chequeo de None antes de len()
+                            if not ndoc:
+                                normalized_data.pop("numero_documento")
+                            elif len(ndoc) != 8:
                                 valid = False
                                 need_clarify_msg = "El DNI debe tener exactamente 8 dígitos (IA detectó otro formato)."
                                 normalized_data.pop("numero_documento") # Invalidar
-                    
+
                     # Teléfono Estricto
                     if "telefono_contacto" in normalized_data:
                         tfon = normalized_data["telefono_contacto"]
-                        if len(tfon) != 9:
+                        # FIX 2: Agregar chequeo de None antes de len()
+                        if not tfon:
+                            normalized_data.pop("telefono_contacto")
+                        elif len(tfon) != 9:
                             valid = False
                             need_clarify_msg = "El teléfono debe tener exactamente 9 dígitos (IA detectó otro formato)."
                             normalized_data.pop("telefono_contacto") # Invalidar
-                    # ─────────────────────────────────────────────────────────────
+                    # -------------------------------------------------------------
 
                 valid = bool(extraction and extraction.get("is_valid")) and valid
                 if not valid and not need_clarify_msg:
@@ -565,23 +544,60 @@ class AIBot:
             except Exception as e:
                 print(f"[AIBot] Gemini error: {e}", flush=True)
 
-        # 3. Reintentos
+        # 3. Reintentos y Manejo de Errores (Humanizado)
         if not valid:
+            # -[ SOFT RETRY LOGIC FOR AGE ]------------------------
+            # Si es la 2da vez que falla en edad, lo dejamos pasar con lo que haya (o 0)
+            if current_key == "edad" and s["retry_count"] >= 1:
+                # Recuperar cualquier int que hayamos podido sacar, o el raw
+                print(f"[AIBot] Soft Retry triggered for Age. Accepting input: {text}")
+                # Intentar re-extract simple
+                forced_age = _extract_int(text)
+                if forced_age:
+                     s["data"]["edad"] = forced_age
+                else:
+                     # Si es texto puro ("tengo quince"), ya intentamos IA antes.
+                     # Si falló, guardamos 0 o null para analizar luego manualmente si se desea.
+                     # Pero para no bloquear, avanzamos.
+                     pass
+
+                # Forzar avance
+                s["retry_count"] = 0
+                s["step"] += 1
+                return self._ask_next(s)
+            # -----------------------------------------------------
+
             s["retry_count"] += 1
             if s["same_answer_count"] >= 2:
                 # Forzar avance si se atasca repitiendo lo mismo
                 s["retry_count"] = 0
                 s["step"] += 1
                 return self._ask_next(s)
-            
-            # Construir mensaje de reprompt contextual
-            if need_clarify_msg:
-                clarify = need_clarify_msg
-            else:
-                # Re-mostrar la pregunta original con hint amigable
-                original_question = self._ask_next(s)
-                clarify = f"No pude interpretar tu respuesta. Intentemos de nuevo:\n\n{original_question}"
-            
+
+            # GENERACIÓN DINÁMICA DE ERROR CON GEMINI
+            # En lugar de solo "El DNI debe tener 8 dígitos", le pedimos a Gemini que lo diga amable.
+            clarify = need_clarify_msg or "No entendí tu respuesta."
+
+            if self.gemini and need_clarify_msg:
+                try:
+                    # Prompt para parafrasear el error amablemente
+                    error_ctx = (
+                        f"El usuario respondió: '{text}'.\n"
+                        f"La validación falló con este error técnico: '{need_clarify_msg}'.\n"
+                        "Actúa como reclutador humano de Hermes Transportes Blindados.\n"
+                        "Cuando el usuario cometa un error:\n"
+                        "- Responde de forma breve, clara y natural.\n"
+                        "- Empieza directamente con la explicación del problema, como si la conversación ya estuviera en curso.\n"
+                        "- NO inicies con saludos formales (Hola, Buen día, etc.).\n"
+                        "- Usa un tono humano y cercano, no robótico ni autoritario.\n"
+                        "- Pide el dato nuevamente con tacto."
+                    )
+                    human_error = self.gemini.respuesta_conversacional(text, error_ctx, self.company_info)
+                    if human_error:
+                        clarify = human_error
+                except Exception as e:
+                    print(f"Error generando error dinámico: {e}")
+
             self._add_to_history(chat_id, "assistant", clarify)
             return clarify
 
@@ -589,14 +605,14 @@ class AIBot:
         s["retry_count"] = 0
         if normalized_data:
             s["data"].update(normalized_data)
-        
+
         # Lógica de transición (saltos condicionales)
         next_step_idx = self._get_next_step_index(s["step"], s["data"])
-        
+
         # Si terminamos el flujo
         if next_step_idx >= len(self.questions_flow):
             return self._finalize_session(chat_id, s)
-        
+
         s["step"] = next_step_idx + 1 # step es 1-based
         return self._ask_next(s)
 
@@ -604,59 +620,70 @@ class AIBot:
         """
         Determina el índice (0-based) de la siguiente pregunta, saltando las irrelevantes.
         """
-        idx = current_step_1based 
-        
-        next_idx = current_step_1based 
-        
+        idx = current_step_1based
+
+        next_idx = current_step_1based
+
         while next_idx < len(self.questions_flow):
             q_key = self.questions_flow[next_idx]
-            
+
             # Condicionales
-            if q_key == "ciudad":
-                # Solo si lugar_residencia es provincia
-                if data.get("origen") != "provincia": 
+            if q_key == "numero_documento":
+                # Si ya tenemos el número (por inferencia en paso anterior), saltamos
+                if data.get("numero_documento"):
                     next_idx += 1
                     continue
-            
+
+            if q_key == "ciudad":
+                # Solo si lugar_residencia es provincia
+                if data.get("origen") != "provincia":
+                    next_idx += 1
+                    continue
+
             if q_key == "licencia_tipo":
                 if not data.get("licencia"):
                     next_idx += 1
                     continue
-            
+
             if q_key == "puesto_otros":
                 # Solo si puesto_id es 18 (Otros)
                 if data.get("puesto_id") != 18:
                     next_idx += 1
                     continue
-            
+
+            if q_key == "puesto_mineria_sucursal":
+                if data.get("puesto_id") not in [12, 13]:
+                    next_idx += 1
+                    continue
+
             if q_key == "medio_captacion_otro":
                 if data.get("medio_captacion") != "otros":
                     next_idx += 1
                     continue
-            
-            if q_key == "horario_entrevista":
+
+            if q_key == "confirmacion_entrevista":
                 # Solo si es APTO. Evaluamos aptitud preliminar aquí.
                 es_apto, _ = self._evaluate_aptitud(data)
                 if not es_apto:
                     next_idx += 1 # Saltamos entrevista si no es apto
                     continue
-            
+
             # Si no se salta, este es el siguiente
             break
-        
+
         return next_idx
 
     def _ask_next(self, s: Dict[str, Any]) -> str:
         step_idx = s["step"] - 1
         if step_idx >= len(self.questions_flow):
-            return "Proceso finalizado." 
-            
+            return "Proceso finalizado."
+
         key = self.questions_flow[step_idx]
         msg = ""
 
         if key == "autorizacion_datos":
             msg = (
-                "🔒 *FORMATO DE CONSENTIMIENTO DE DATOS PERSONALES*\n\n"
+                "?? *FORMATO DE CONSENTIMIENTO DE DATOS PERSONALES*\n\n"
                 "Autorizo a HERMES TRANSPORTES BLINDADOS S.A. a tratar mis datos personales sensibles (antecedentes policiales, penales, judiciales, historial crediticio) "
                 "para evaluar mi idoneidad en el proceso de selección, y a conservar mi CV por 6 meses. "
                 "Puede ejercer sus derechos ARCO en protecciondatospersonales@hermes.com.pe.\n\n"
@@ -664,7 +691,7 @@ class AIBot:
             )
         elif key == "nombre":
             msg = (
-                "✅ Gracias. A continuación, iniciaremos un cuestionario de aprox. 20 preguntas como pre-entrevista de trabajo. "
+                "? Gracias. A continuación, iniciaremos un cuestionario de aprox. 20 preguntas como pre-entrevista de trabajo. "
                 "Por favor asegúrate de completarlas todas correctamente.\n\n"
                 "1) Por favor, indícame tus *Nombres* (sin apellidos)."
             )
@@ -693,7 +720,7 @@ class AIBot:
         elif key == "lugar_residencia":
             msg = "13) Indica tu lugar de residencia (Lima / Provincia)."
         elif key == "ciudad":
-            msg = "14) Indica la *ciudad* de residencia."
+            msg = "14) Indica el *nombre de la provincia* de residencia."
         elif key == "licencia":
             msg = "15) ¿Cuentas con Licencia de Conducir? (Sí / No)"
         elif key == "licencia_tipo":
@@ -702,6 +729,8 @@ class AIBot:
             msg = "17) Indica el puesto al que postulas:\n" + _build_puestos_menu_text(include_header=False)
         elif key == "puesto_otros":
             msg = "18) Especifica el puesto al que deseas postular."
+        elif key == "puesto_mineria_sucursal":
+            msg = "Elige Sucursal:\n1. Arequipa\n2. Trujillo\n3. Huanuco\n4. Cusco\n5. Otros"
         elif key == "disponibilidad":
             msg = "19) ¿Cuentas con disponibilidad inmediata? (Sí / No)"
         elif key == "medio_captacion":
@@ -709,49 +738,74 @@ class AIBot:
                    "1. Tik Tok\n2. Canal de Whatsapp\n3. Correo\n4. Volante\n5. QR\n6. Facebook\n7. Referidos\n8. Instagram\n9. Otros")
         elif key == "medio_captacion_otro":
             msg = "Por favor especifica el medio por el cual te enteraste."
-        elif key == "horario_entrevista":
-            msg = ("🎉 ¡Felicidades! Cumples con los requisitos preliminares.\n"
-                   "Para agendar tu entrevista, por favor indícame una **hora exacta** en la que podrías acercarte (entre 9am-1pm o 3pm-5pm).\n"
-                   "Ejemplo: *10:00 am*, *11:30*, *4 pm*.")
-        
+        elif key == "confirmacion_entrevista":
+            # Calcular fecha con AFORO y DÍAS HÁBILES
+            fecha_iso, dia_esp, fecha_fmt_short = self._get_next_valid_slot()
+
+            # Guardamos la fecha propuesta en sesión temporal data por si confirma
+            s["data"]["propuesta_fecha"] = fecha_iso
+
+            msg = (
+                "?? ¡Felicidades! Cumples con los requisitos preliminares.\n\n"
+                f"Queremos invitarte a una evaluación presencial el día *{dia_esp} {fecha_fmt_short} a las 08:30 AM*.\n"
+                "Será un *Full Day* donde realizaremos exámenes médicos, pruebas físicas y evaluaciones psicológicas.\n\n"
+                "¿Nos confirmas tu asistencia? (Sí / No)"
+            )
+
         return msg
 
     def _finalize_session(self, chat_id: str, s: Dict[str, Any]) -> str:
         s["completed"] = True
         s["completion_time"] = datetime.now()
-        
+
         es_apto, razones = self._evaluate_aptitud(s["data"])
         s["is_apto"] = es_apto
-        
+
         # Guardar en DB
         if self.db and hasattr(self.db, "save_postulante"):
             self.db.save_postulante(chat_id, s)
-        
+
         final_msg = ""
         if es_apto:
-            # Si llegó a agendar entrevista (o si se saltó por error, asumimos apto)
-            horario = s["data"].get("horario_entrevista")
-            texto_horario = f"a las {horario}" if horario else "en el horario seleccionado"
-            
-            final_msg = (
-                f"✅ ¡Excelente! Tu entrevista ha sido agendada para hoy/mañana {texto_horario}.\n"
-                "Te esperamos en: *Av. Prol. Huaylas 1720, Chorrillos*.\n"
-                "No olvides llevar tu DNI y CV impreso. ¡Éxitos! 🍀"
-            )
+            # Mensaje de éxito si confirmó
+            confirmed = s["data"].get("confirmacion_asistencia")
+            fecha_iso = s["data"].get("fecha_entrevista")
+
+            if confirmed:
+                try:
+                    fecha_obj = datetime.fromisoformat(fecha_iso)
+                    fecha_fmt = fecha_obj.strftime("%d/%m a las %H:%M")
+                except:
+                    fecha_fmt = "la fecha indicada"
+
+                final_msg = (
+                    f"? ¡Excelente! Tu entrevista ha sido agendada para el *{fecha_fmt}*.\n"
+                    "Te esperamos en: *Av. Prol. Huaylas 1720, Chorrillos*.\n"
+                    "No olvides llevar tu DNI y CV impreso. ¡Éxitos! ??"
+                )
+            else:
+                final_msg = (
+                    "Entendido. Lamentamos que no puedas asistir en este horario. ??\n"
+                    "Dejaremos tus datos registrados y te contactaremos si se abre otra fecha. ¡Gracias!"
+                )
         else:
+            razones_txt = ", ".join(razones) if razones else "perfil no ajustado"
+            # Mensaje suave de rechazo
             final_msg = (
-                "Gracias por completar tu postulación. 🙌\n"
-                "Tu información ha sido registrada. Si tu perfil se ajusta a las vacantes, "
-                "nos pondremos en contacto contigo. ¡Buen día!"
-            )
-            
+                "Muchas gracias por completar tu postulación. ??\n"
+                "Hemos registrado correctamente tu información.\n"
+                "Tu perfil será evaluado y considerado en los procesos correspondientes.\n"
+                "¡Gracias por tu interés en Hermes Transportes Blindados!"
+                     )
+
+
         s["final_response"] = final_msg
         self._add_to_history(chat_id, "assistant", final_msg)
         return final_msg
 
-    # ─────────────────────────────────────────────────────────────
+    # -------------------------------------------------------------
     # Validación heurística
-    # ─────────────────────────────────────────────────────────────
+    # -------------------------------------------------------------
     def _validate_and_extract_soft(self, key: str, text: str, current: Dict[str, Any]) -> tuple[bool, Dict[str, Any], Optional[str]]:
         t = text.strip()
         tn = _norm_text(text)
@@ -765,8 +819,8 @@ class AIBot:
             if y is False:
                 # Si dice NO, terminamos la sesión (o manejamos rechazo)
                 # Por ahora retornamos False con mensaje de despedida/error
-                return False, {}, "Entendido. Sin tu consentimiento no podemos continuar con el proceso. Gracias por tu interés. 👋"
-            
+                return False, {}, "Entendido. Sin tu consentimiento no podemos continuar con el proceso. Gracias por tu interés. ??"
+
             return False, {}, "Por favor responde *Sí* o *Acepto* para continuar, o *No* para salir."
 
         if key == "nombre":
@@ -785,30 +839,39 @@ class AIBot:
 
         if key == "edad":
             age = _extract_int(t)
-            if age is not None and 10 <= age <= 99:
+            if age is not None:
+                # Regla de Negocio (Filtro oculto)
+                # Si es menor de 18 o mayor de 50, pedimos verificar (Generic Retry)
+                if age < 18 or age > 50:
+                    return False, {}, "Por favor, verifica tu respuesta e ingresa tu edad correcta en números."
+
+                # Si pasa el filtro, guardamos
                 out["edad"] = age
                 return True, out, None
+
             return False, {}, "Ingresa una edad válida (número)."
 
         if key == "genero":
-            if "masculino" in tn or "hombre" in tn or "varon" in tn or tn == "m":
+            if "masculino" in tn or "hombre" in tn or tn == "m":
                 out["genero"] = "M"
                 return True, out, None
-            if "femenino" in tn or "mujer" in tn or "dama" in tn or tn == "f":
+            if "femenino" in tn or "mujer" in tn or tn == "f":
                 out["genero"] = "F"
                 return True, out, None
             if "otro" in tn or "prefiero" in tn:
                 out["genero"] = "O"
                 return True, out, None
-            # Fuzzy matching para typos
-            genero_map = {"masculino": "M", "femenino": "F", "otros": "O"}
-            fuzzy = _fuzzy_match(t, list(genero_map.keys()))
-            if fuzzy:
-                out["genero"] = genero_map[fuzzy]
-                return True, out, None
-            return False, {}, "No pude interpretar tu respuesta. Elige: Masculino, Femenino u Otros."
+            return False, {}, "Elige: Masculino, Femenino u Otros."
 
         if key == "tipo_documento":
+            # 1. Inferencia por números: Si pone 8 dígitos, es DNI.
+            nums_only = re.sub(r"\D", "", t)
+            if len(nums_only) == 8:
+                out["tipo_documento"] = "dni"
+                out["dni"] = True
+                out["numero_documento"] = nums_only  # Autocorregir step siguiente
+                return True, out, None
+
             if "dni" in tn:
                 out["tipo_documento"] = "dni"
                 out["dni"] = True # Legacy
@@ -820,32 +883,45 @@ class AIBot:
             return False, {}, "Responde DNI o Carné de Extranjería."
 
         if key == "numero_documento":
+            # 1. Limpieza agresiva pero smart
             nums = re.sub(r"\D", "", t)
             tipo = current.get("tipo_documento")
-            
-            # CE: >= 8 dígitos
+
+            # Caso CE
             if tipo == "ce":
                 if len(nums) >= 8:
                     out["numero_documento"] = nums
                     return True, out, None
                 return False, {}, "El Carné de Extranjería debe tener al menos 8 dígitos."
-            
-            # DNI (o default): EXACTAMENTE 8 dígitos
+
+            # Caso DNI (o default) -> REGLA ESTRICTA 8 DÍGITOS
             if len(nums) == 8:
                 out["numero_documento"] = nums
                 if not tipo:
                     out["tipo_documento"] = "dni"
                     out["dni"] = True
                 return True, out, None
-            
-            return False, {}, "El DNI debe tener exactamente 8 dígitos. Verifica tu respuesta."
+
+            # Si tiene 9 o más, es error (probablemente tipeó mal o puso otro número)
+            if len(nums) > 8:
+                return False, {}, f"Parece que escribiste {len(nums)} números. El DNI debe tener exactamente 8."
+
+            # Si tiene menos de 8
+            if len(nums) < 8 and len(nums) > 0:
+                return False, {}, f"Solo detecté {len(nums)} números. El DNI debe tener 8."
+
+            return False, {}, "Por favor escribe solo el número de tu DNI."
 
         if key == "telefono":
             nums = re.sub(r"\D", "", t)
-            # EXACTAMENTE 9 dígitos para celular Perú
-            if len(nums) == 9: 
+            # REGLA ESTRICTA 9 DÍGITOS (Celular Perú)
+            if len(nums) == 9:
                 out["telefono_contacto"] = nums
                 return True, out, None
+
+            if len(nums) > 9:
+                return False, {}, f"Detecté {len(nums)} dígitos. El celular debe tener exactamente 9."
+
             return False, {}, "El teléfono debe tener exactamente 9 dígitos."
 
         if key == "correo":
@@ -859,7 +935,7 @@ class AIBot:
             if any(w in tn for w in higher_ed):
                 out["secundaria"] = True
                 return True, out, None
-            
+
             if "completa" in tn or "si" in tn or "culminad" in tn:
                 out["secundaria"] = True
                 return True, out, None
@@ -883,19 +959,7 @@ class AIBot:
             if "tiempo completo" in tn or "full" in tn: out["modalidad_trabajo"] = "tiempo_completo"; return True, out, None
             if "medio" in tn or "part" in tn: out["modalidad_trabajo"] = "medio_tiempo"; return True, out, None
             if "intermitente" in tn or "dias" in tn: out["modalidad_trabajo"] = "intermitente"; return True, out, None
-            # Fuzzy matching para typos
-            modalidad_map = {
-                "tiempo completo": "tiempo_completo",
-                "medio tiempo": "medio_tiempo",
-                "intermitente": "intermitente",
-                "completo": "tiempo_completo",
-                "parcial": "medio_tiempo",
-            }
-            fuzzy = _fuzzy_match(t, list(modalidad_map.keys()))
-            if fuzzy:
-                out["modalidad_trabajo"] = modalidad_map[fuzzy]
-                return True, out, None
-            return False, {}, "No pude interpretar tu respuesta. Por favor responde con el número:\n1. Tiempo Completo\n2. Medio Tiempo\n3. Intermitente por días"
+            return False, {}, "Elige una opción válida (1, 2 o 3)."
 
         if key == "distrito":
             out["distrito_residencia"] = t
@@ -912,7 +976,7 @@ class AIBot:
                 out["lugar_residencia"] = "Provincia"
                 out["origen"] = "provincia"
                 return True, out, None
-            
+
             lima_districts = ["surco", "miraflores", "san isidro", "borja", "molina", "chorrillos", "barranco", "lince", "jesus maria", "magdalena", "pueblo libre", "san miguel", "callao", "olivos", "comas", "sj", "villa", "ate", "santa anita", "rimac", "breña", "victoria", "agustino", "independencia", "puente piedra", "carabayllo", "lurigancho", "chaclacayo", "cieneguilla", "lurin", "pachacamac", "pucusana", "punta hermosa", "punta negra", "san bartolo", "santa maria", "ancon", "santa rosa"]
             if any(d in tn for d in lima_districts):
                 out["lugar_residencia"] = "Lima"
@@ -954,7 +1018,7 @@ class AIBot:
                         out["destino"] = puesto_loc.lower() if puesto_loc != "Ambos" else "ambos"
                         return True, out, None
                 except: pass
-            
+
             info = _puesto_from_text(t)
             if info:
                 out.update(info)
@@ -983,7 +1047,7 @@ class AIBot:
             if m and m.group(1) in mapping:
                 out["medio_captacion"] = mapping[m.group(1)]
                 return True, out, None
-            
+
             if "tiktok" in tn: out["medio_captacion"] = "tiktok"; return True, out, None
             if "whatsapp" in tn: out["medio_captacion"] = "canal_whatsapp"; return True, out, None
             if "correo" in tn or "email" in tn: out["medio_captacion"] = "correo"; return True, out, None
@@ -993,121 +1057,217 @@ class AIBot:
             if "referido" in tn: out["medio_captacion"] = "referido"; return True, out, None
             if "instagram" in tn: out["medio_captacion"] = "instagram"; return True, out, None
             if "otro" in tn: out["medio_captacion"] = "otros"; return True, out, None
-            
+
             return False, {}, "Elige una opción válida (1-9)."
 
         if key == "medio_captacion_otro":
             out["medio_captacion_otro"] = t
             return True, out, None
 
-        if key == "horario_entrevista":
-            time_str = t.lower().replace(".", "").replace(" ", "")
-            hour = None
-            minute = 0
-            
-            m = re.search(r"(\d{1,2}):(\d{2})", time_str)
-            if m:
-                h = int(m.group(1))
-                mn = int(m.group(2))
-                if "pm" in time_str and h < 12: h += 12
-                if "am" in time_str and h == 12: h = 0
-                hour, minute = h, mn
-            else:
-                m = re.search(r"(\d{1,2})(am|pm)?", time_str)
-                if m:
-                    h = int(m.group(1))
-                    suffix = m.group(2)
-                    if suffix == "pm" and h < 12: h += 12
-                    if suffix == "am" and h == 12: h = 0
-                    if not suffix:
-                        if 1 <= h <= 6: h += 12 
-                    hour, minute = h, 0
+        if key == "confirmacion_entrevista":
+            y = self._yes_no_soft(tn)
 
-            if hour is not None:
-                if minute > 30:
-                    minute = 0
-                    hour += 1
-                elif 0 < minute < 30:
-                    minute = 30
-                
-                valid_time = False
-                time_val = hour + minute/60.0
-                
-                if 9 <= time_val <= 13: valid_time = True
-                if 15 <= time_val <= 17: valid_time = True
-                
-                if valid_time:
-                    final_time = f"{hour:02d}:{minute:02d}"
-                    out["horario_entrevista"] = final_time
-                    return True, out, None
-                else:
-                    return False, {}, "El horario debe ser entre 9am-1pm o 3pm-5pm."
-            
-            return False, {}, "No entendí la hora. Por favor usa formato como '10:00 am' o '4 pm'."
+            # Recuperar fecha propuesta o calcular de nuevo si no está (edge case)
+            fecha_iso = current.get("propuesta_fecha")
+            if not fecha_iso:
+                fecha_iso, _, _ = self._get_next_valid_slot()
+
+            out["fecha_entrevista"] = fecha_iso
+
+            if y is True:
+                out["confirmacion_asistencia"] = True
+                return True, out, None
+            if y is False:
+                out["confirmacion_asistencia"] = False
+                return True, out, None
+
+            return False, {}, "Por favor confirma si puedes asistir (Sí / No)."
 
         if key == "puesto_otros":
             out["puesto_otros_detalle"] = t
             return True, out, None
 
+        if key == "puesto_mineria_sucursal":
+            # 1. Arequipa, 2. Trujillo, 3. Huanuco, 4. Cusco, 5. Otros
+            mapping = {
+                "1": "Arequipa", "2": "Trujillo", "3": "Huanuco", "4": "Cusco", "5": "Otros"
+            }
+            # Match por numero
+            m = re.search(r"\b([1-5])\b", t)
+            if m:
+                out["puesto_otros_detalle"] = mapping[m.group(1)] # Reutilizamos campo
+                return True, out, None
+
+            # Match por texto
+            tn_lower = tn.lower()
+            if "arequipa" in tn_lower: out["puesto_otros_detalle"] = "Arequipa"; return True, out, None
+            if "trujillo" in tn_lower: out["puesto_otros_detalle"] = "Trujillo"; return True, out, None
+            if "huanuco" in tn_lower: out["puesto_otros_detalle"] = "Huanuco"; return True, out, None
+            if "cusco" in tn_lower: out["puesto_otros_detalle"] = "Cusco"; return True, out, None
+            if "otro" in tn_lower: out["puesto_otros_detalle"] = "Otros"; return True, out, None
+
+            return False, {}, "Elige una opción válida (1-5)."
+
         return False, {}, "No entendí tu respuesta."
 
     def _yes_no_soft(self, tn: str) -> Optional[bool]:
-        yes_markers = {
-            "si", "sí", "sip", "sep", "claro", "yes", "correcto", "obvio",
-            "acepto", "ok", "dale", "de una", "va", "afirmativo", "por supuesto",
-            "asi es", "efectivamente", "listo",
-        }
-        no_markers = {
-            "no", "nop", "nope", "nel", "nah", "negativo", "nunca", "jamas",
-            "para nada", "tampoco",
-        }
-        if any(m in tn for m in yes_markers): return True
-        if any(m in tn for m in no_markers): return False
+        yes_markers = {"si", "sí", "sip", "claro", "yes", "correcto", "obvio", "acepto", "simon", "dale", "por supuesto"}
+        no_markers = {"no", "nop", "negativo", "nunca", "jamas", "nel", "naranjas"}
+
+        # Tokenización simple para evitar falsos positivos parciales, pero permitiendo frases
+        # "simon" -> True, "nel" -> False
+
+        # 1. Match exacto o palabra única
+        if tn in yes_markers: return True
+        if tn in no_markers: return False
+
+        # 2. Búsqueda en texto
+        for m in yes_markers:
+            # \b para palabras completas
+            if re.search(rf"\b{re.escape(m)}\b", tn): return True
+
+        for m in no_markers:
+            if re.search(rf"\b{re.escape(m)}\b", tn): return False
+
         return None
 
+        return None
+
+    # -------------------------------------------------------------
+    # Reglas de Aptitud (Evaluación final)
+    # -------------------------------------------------------------
     def _evaluate_aptitud(self, data: Dict[str, Any]) -> tuple[bool, List[str]]:
         reasons = []
-        
         # 1. Edad
         edad = data.get("edad")
         if isinstance(edad, int):
             if edad < 18 or edad > 50:
                 reasons.append("Edad fuera de rango (18-50)")
-        
-        # 2. Ubicación (Regla Puesto vs Origen)
+
+        # 2. Ubicación (Regla Puesto vs Origen ESTRICTA)
         puesto_id = data.get("puesto_id")
-        origen = data.get("origen") # "lima" o "provincia" (lowercase)
-        
+        origen = data.get("origen") # "lima" o "provincia"
+
         if puesto_id:
-            puesto_loc = PUESTO_UBICACION.get(puesto_id, "Ambos") # "Lima", "Provincia", "Ambos"
-            
-            if puesto_loc == "Lima":
-                if origen != "lima":
-                    reasons.append("Vive en Provincia pero puesto es en Lima")
-            elif puesto_loc == "Provincia":
-                if origen != "provincia":
-                    reasons.append("Vive en Lima pero puesto es en Provincia")
-            # Si es "Ambos", es apto sea de donde sea (siempre que coincida con la lógica de negocio, asumimos que sí)
-            
+            puesto_loc = PUESTO_UBICACION.get(puesto_id, "Ambos")
+
+            if puesto_loc == "Lima" and origen != "lima":
+                reasons.append("Postulante de Provincia para puesto en Lima")
+            elif puesto_loc == "Provincia" and origen != "provincia":
+                 reasons.append("Postulante de Lima para puesto en Provincia")
+
+        # 2b. Regla Especial Minería (Puestos 12 y 13)
+        if puesto_id in [12, 13]:
+            # El usuario eligió una Sucursal (guardada en puesto_otros_detalle)
+            # Y declaró una provincia en 'ciudad_residencia' (Q14)
+            sucursal = data.get("puesto_otros_detalle") # "Trujillo", "Arequipa", etc.
+            ciudad_residencia = data.get("ciudad_residencia", "")
+
+            if not sucursal or not ciudad_residencia:
+                reasons.append("Faltan datos de ubicación Minería")
+            else:
+                # Validar Match: Ciudad vs Sucursal
+                match_ok = False
+
+                # Check 1: Match directo de texto
+                s_norm = _norm_text(sucursal)
+                c_norm = _norm_text(ciudad_residencia)
+
+                if s_norm in c_norm or c_norm in s_norm:
+                    match_ok = True
+
+                # Check 2: Sinonimos conocidos (La Libertad -> Trujillo)
+                # Expandir según necesidad
+                if not match_ok:
+                    if "libertad" in c_norm and "trujillo" in s_norm: match_ok = True
+
+                # Check 3: Gemini (Fuzzy semantic match)
+                if not match_ok and self.gemini:
+                    try:
+                        # Preguntamos a Gemini si la ciudad X pertenece a la región Y
+                        ctx_val = (
+                            f"El candidato dice vivir en: '{ciudad_residencia}'.\n"
+                            f"La sucursal/región requerida es: '{sucursal}'.\n"
+                            "Responde SOLO 'SI' si la ciudad está en esa región o es la misma, o 'NO' si es diferente."
+                        )
+                        val_resp = self.gemini.respuesta_conversacional("", ctx_val, {})
+                        if val_resp and "si" in _norm_text(val_resp):
+                             match_ok = True
+                    except: pass
+
+                if not match_ok and sucursal != "Otros":
+                   # Si es 'Otros', quizás somos laxos o lo mandamos a revisión.
+                   # Asumiremos que si eligió 'Otros', requiere validación manual, pero no auto-rechazo
+                   # O según regla: "solo para esos caso... regla de aptos y no aptos varía"
+                   # Si puso Sucursal=Arequipa y vive en Iquitos -> No Apto.
+                   reasons.append(f"Ubicación ({ciudad_residencia}) no coincide con Sucursal ({sucursal})")
+
         # 3. Secundaria
         if not data.get("secundaria"):
             reasons.append("Sin secundaria completa")
-            
-        # 4. DNI
-        if not data.get("dni") and data.get("tipo_documento") != "dni":
-             # Si es CE, podría ser válido, pero si la regla es estricta DNI:
-             # reasons.append("Documento no es DNI")
-             pass # Dejamos pasar si tiene documento válido (ya validado en paso anterior)
-             
+
+        # 4. Documento (CE descartado)
+        if data.get("tipo_documento") == "ce":
+             reasons.append("Carné de Extranjería no aceptado")
+
         # 5. Licencia para puestos 8 y 9
         if puesto_id in [8, 9] and not data.get("licencia"):
             reasons.append("Puesto requiere licencia")
-            
+
         # 6. Disponibilidad
         if not data.get("disponibilidad"):
             reasons.append("Sin disponibilidad inmediata")
-            
+
         return len(reasons) == 0, reasons
+
+    # -------------------------------------------------------------
+    # Lógica de Aforo / Fechas Validás
+    # -------------------------------------------------------------
+    def _get_next_valid_slot(self) -> tuple[str, str, str]:
+        """
+        Busca el siguiente día hábil (Lun-Vie) con aforo disponible (<40).
+        Retorna (iso_full_datetime, dia_semana_esp, fecha_corta_dd_mm).
+        """
+        candidate = datetime.now() + timedelta(days=1)
+
+        # Límite de búsqueda para evitar loop infinito (ej. 30 días)
+        for _ in range(30):
+            # 1. Ajuste Fin de Semana (Lunes a Viernes solamente)
+            wd = candidate.weekday() # 0=Mon ... 6=Sun
+            if wd == 5: # Sábado -> Lunes
+                candidate += timedelta(days=2)
+            elif wd == 6: # Domingo -> Lunes
+                candidate += timedelta(days=1)
+
+            # Ahora candidate es Mon-Fri
+
+            # 2. Check Capacity en DB
+            # Formato ISO base para la query
+            iso_check = candidate.strftime("%Y-%m-%d")
+
+            count = 0
+            if self.db and hasattr(self.db, "get_count_for_date"):
+                count = self.db.get_count_for_date(iso_check)
+
+            if count < 40:
+                # Slot encontrado!
+                candidate = candidate.replace(hour=8, minute=30, second=0, microsecond=0)
+
+                # Formatear
+                dia_str = candidate.strftime("%A")
+                dias = {"Monday": "Lunes", "Tuesday": "Martes", "Wednesday": "Miércoles", "Thursday": "Jueves", "Friday": "Viernes"}
+                dia_esp = dias.get(dia_str, dia_str)
+                fecha_fmt_short = candidate.strftime("%d/%m")
+
+                return candidate.isoformat(), dia_esp, fecha_fmt_short
+
+            else:
+                # Día lleno, probar siguiente
+                candidate += timedelta(days=1)
+
+        # Fallback (si todo lleno por 1 mes, devolvemos mañana igual para no romper, o log error)
+        fallback = datetime.now() + timedelta(days=1)
+        return fallback.isoformat(), "mañana", fallback.strftime("%d/%m")
 
     def _forced_options_question(self, key: str) -> str:
         return f"Por favor responde la pregunta ({key}) de forma clara."
