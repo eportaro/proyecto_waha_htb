@@ -444,7 +444,7 @@ class AIBot:
                     else:
                         ctx_parts.append("Entrevista: pendiente de asignar.")
                 else:
-                    ctx_parts.append("Estado del postulante: NO APTO (Registrado para futura consideración).")
+                    ctx_parts.append("Estado del postulante: Postulación completada. Perfil registrado y en evaluación por el equipo de RRHH.")
 
                 ctx_parts.append(f"\nFecha postulación: {s.get('completion_time')}")
                 context_str = "\n".join(ctx_parts)
