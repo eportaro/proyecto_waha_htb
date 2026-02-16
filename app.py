@@ -61,13 +61,36 @@ def health():
 # UTIL: EXTRACCIÓN ROBUSTA DE TEXTO Y CHAT_ID DESDE WAHA
 # ────────────────────────────────────────────────────────────────
 def _extract_chat_and_text(payload: dict) -> tuple[str | None, str]:
-    chat_id = (
-        payload.get("from")
-        or payload.get("chatId")
-        or payload.get("sender")
-        or payload.get("author")
-        or ""
-    )
+    # 1. Intentar obtener el ID real del usuario desde la metadata interna de Waha (_data)
+    # Esto es critico porque 'from' puede ser un LID o ID de grupo
+    chat_id = None
+
+    # Prioridad 1: _data.id.user (Suele ser el numero limpio: 51999999999)
+    try:
+        user_part = payload.get("_data", {}).get("id", {}).get("user")
+        if user_part and user_part.isdigit():
+            # Reconstruir formato standard @c.us si es necesario,
+            # pero mejor usemos lo que el bot espera
+            chat_id = f"{user_part}@c.us"
+    except: pass
+
+    # Prioridad 2: _data.id.remote (Suele ser el JID completo: 51999999999@c.us)
+    if not chat_id:
+        try:
+              remote = payload.get("_data", {}).get("id", {}).get("remote")
+              if remote and "@" in remote and "g.us" not in remote:
+                   chat_id = remote
+        except: pass
+
+    # Prioridad 3: Fallback a los campos de nivel superior
+    if not chat_id:
+        chat_id = (
+            payload.get("from")
+            or payload.get("chatId")
+            or payload.get("sender")
+            or payload.get("author")
+            or ""
+        )
 
     text = (
         payload.get("body")
