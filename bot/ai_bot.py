@@ -420,15 +420,27 @@ class AIBot:
 
             # Chat libre post-postulación
             if self.gemini:
-                # Construir contexto rico
+                # Construir contexto rico para que Gemini tenga info precisa
                 ctx_parts = []
                 if s.get("is_apto"):
                     ctx_parts.append("Estado: APTO (Pre-aprobado).")
-                    horario = s["data"].get("horario_entrevista")
-                    if horario:
-                        ctx_parts.append(f"Entrevista agendada: {horario}.")
+                    fecha_iso = s["data"].get("fecha_entrevista")
+                    confirmado = s["data"].get("confirmacion_asistencia")
+                    if fecha_iso and confirmado:
+                        try:
+                            from datetime import datetime as _dt
+                            fecha_obj = _dt.fromisoformat(fecha_iso)
+                            fecha_fmt = fecha_obj.strftime("%d/%m/%Y a las %H:%M")
+                        except Exception:
+                            fecha_fmt = fecha_iso
+                        ctx_parts.append(f"Entrevista CONFIRMADA para: {fecha_fmt}.")
+                        ctx_parts.append("Lugar de entrevista: Av. Prol. Huaylas 1720, Chorrillos.")
+                        ctx_parts.append("Documentos requeridos: DNI y CV impreso.")
+                        ctx_parts.append("Es un Full Day con exámenes médicos, pruebas físicas y evaluaciones psicológicas.")
+                    elif fecha_iso:
+                        ctx_parts.append(f"Entrevista propuesta: {fecha_iso} (no confirmada por el postulante).")
                     else:
-                        ctx_parts.append("Entrevista: Pendiente o no seleccionada.")
+                        ctx_parts.append("Entrevista: pendiente de asignar.")
                 else:
                     ctx_parts.append("Estado: NO APTO (Registrado para futura consideración).")
 

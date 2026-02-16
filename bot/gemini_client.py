@@ -4,6 +4,7 @@ from __future__ import annotations
 import os
 import re
 import json
+import time
 from typing import Any, Dict, Optional, List
 
 from dotenv import load_dotenv
@@ -24,8 +25,10 @@ except Exception:
 load_dotenv()
 
 API_KEY = os.getenv("GOOGLE_API_KEY")
-# Modelos recomendados: "gemini-2.5-flash", "gemini-1.5-flash"
+# Modelo principal (rápido)
 MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+# Modelo robusto de respaldo (si el principal falla)
+FALLBACK_MODEL_NAME = os.getenv("GEMINI_FALLBACK_MODEL", "gemini-2.5-pro")
 TEMPERATURE = float(os.getenv("GEMINI_TEMPERATURE", "0.0")) # Temperatura baja para determinismo
 MAX_TOKENS = int(os.getenv("GEMINI_MAX_TOKENS", "600"))
 # Si quieres forzar safety explícito (solo si el SDK soporta enums):
@@ -150,59 +153,96 @@ class GeminiClient:
     # ─────────────────────────────────────────────────────────────
     # Núcleo de generación (robusto ante cambios del SDK)
     # ─────────────────────────────────────────────────────────────
-    def _generate(self, prompt: str) -> Optional[str]:
+    def _extract_text_from_response(self, resp) -> Optional[str]:
+        """Extrae texto de una respuesta de Gemini (compatible con varios SDKs)."""
+        # 1) Camino feliz: atributo .text
+        try:
+            text = getattr(resp, "text", None)
+            if text:
+                return text.strip()
+        except Exception:
+            pass
+
+        # 2) Analizar candidates y parts (SDKs recientes)
+        if hasattr(resp, "candidates") and resp.candidates:
+            cand = resp.candidates[0]
+            fr = getattr(cand, "finish_reason", None)
+            fr_val = str(fr).lower() if fr is not None else ""
+            if any(k in fr_val for k in ["safety", "blocklist", "prohibited", "spii"]):
+                print(
+                    f"[Gemini] Bloqueado por finish_reason={fr}. "
+                    f"prompt_feedback={getattr(resp, 'prompt_feedback', None)}",
+                    flush=True,
+                )
+                return None
+
+            content = getattr(cand, "content", None)
+            if content and hasattr(content, "parts"):
+                texts: List[str] = []
+                for p in content.parts:
+                    t = getattr(p, "text", None)
+                    if t:
+                        texts.append(t)
+                if texts:
+                    return "\n".join(texts).strip()
+
+        return None
+
+    def _generate(self, prompt: str, retries: int = 2) -> Optional[str]:
         """
-        Genera texto con Gemini y maneja respuestas sin .text / candidates.
-        Retorna str (posible JSON) o None si fue bloqueado o falló.
+        Genera texto con Gemini. Incluye retry y fallback a modelo robusto.
+        Flujo: Flash (retry) → Pro (fallback) → None
         """
         if not self.model:
             return None
-        try:
-            resp = self.model.generate_content(prompt)
 
-            # 1) Camino feliz: atributo .text (puede lanzar si no hay parts)
-            text = None
+        last_error = None
+        for attempt in range(retries):
             try:
-                text = getattr(resp, "text", None)
-            except Exception:
-                text = None
-            if text:
-                return text.strip()
+                resp = self.model.generate_content(prompt)
+                text = self._extract_text_from_response(resp)
+                if text:
+                    return text
+            except Exception as e:
+                last_error = e
+                error_msg = str(e).lower()
+                print(f"[Gemini Flash] Intento {attempt + 1}/{retries} falló: {e}", flush=True)
 
-            # 2) Analizar candidates y parts (SDKs recientes)
-            cand = None
-            if hasattr(resp, "candidates") and resp.candidates:
-                cand = resp.candidates[0]
-                # finish_reason puede ser enum/int/str; normalizamos
-                fr = getattr(cand, "finish_reason", None)
-                fr_val = str(fr).lower() if fr is not None else ""
-                # Bloqueos por safety / listas
-                if any(k in fr_val for k in ["safety", "blocklist", "prohibited", "spii"]):
-                    print(
-                        f"[Gemini] Bloqueado por finish_reason={fr}. "
-                        f"prompt_feedback={getattr(resp, 'prompt_feedback', None)}",
-                        flush=True,
-                    )
+                # Si la API key es inválida, no reintentar
+                if "leaked" in error_msg or "403" in error_msg or "invalid api key" in error_msg:
+                    print("[Gemini] API key inválida/revocada. Desactivando.", flush=True)
+                    self.model = None
                     return None
 
-                content = getattr(cand, "content", None)
-                if content and hasattr(content, "parts"):
-                    texts: List[str] = []
-                    for p in content.parts:
-                        t = getattr(p, "text", None)
-                        if t:
-                            texts.append(t)
-                    if texts:
-                        return "\n".join(texts).strip()
+            # Pausa antes de reintentar (solo si no es el último intento)
+            if attempt < retries - 1:
+                time.sleep(1.5)
 
+        # Si flash falló, intentar con modelo robusto
+        print(f"[Gemini] Flash agotó reintentos. Intentando con {FALLBACK_MODEL_NAME}...", flush=True)
+        return self._generate_fallback(prompt)
+
+    def _generate_fallback(self, prompt: str) -> Optional[str]:
+        """
+        Modelo de respaldo: gemini-2.5-pro (más robusto, sin JSON mode forzado).
+        """
+        if not genai:
             return None
+        try:
+            fallback = genai.GenerativeModel(
+                model_name=FALLBACK_MODEL_NAME,
+                generation_config={
+                    "temperature": 0.2,
+                    "max_output_tokens": MAX_TOKENS,
+                },
+            )
+            resp = fallback.generate_content(prompt)
+            text = self._extract_text_from_response(resp)
+            if text:
+                print(f"[Gemini] ✅ Respaldo {FALLBACK_MODEL_NAME} respondió OK.", flush=True)
+            return text
         except Exception as e:
-            error_msg = str(e).lower()
-            print(f"[Gemini Error] {e}", flush=True)
-            # Si la API key fue revocada/leaked, desactivar Gemini para no repetir calls
-            if "leaked" in error_msg or "403" in error_msg or "invalid api key" in error_msg:
-                print("[Gemini] API key inválida/revocada. Desactivando Gemini para esta sesión.", flush=True)
-                self.model = None
+            print(f"[Gemini Fallback Error] {e}", flush=True)
             return None
 
     # ─────────────────────────────────────────────────────────────
@@ -534,24 +574,28 @@ JSON ESPERADO:
                 "Nuestro equipo se comunicará contigo a la brevedad. 🙏"
             )
 
-        prompt = f"""Eres un asistente de RRHH amable de {company_info.get('nombre','la empresa')}.
+        nombre_empresa = company_info.get('nombre', 'la empresa')
+
+        prompt = f"""Eres un reclutador profesional y amable de {nombre_empresa}. Hablas por WhatsApp con un postulante que ya completó su proceso de postulación.
+
 CONTEXTO DEL CANDIDATO:
 {context}
 
 MENSAJE DEL USUARIO: "{user_message}"
 
 INSTRUCCIONES:
-1. Responde brevemente y con calidez.
-2. Si el usuario pide cambiar su horario de entrevista:
-   - Si ya tiene uno agendado, dile amablemente que por ahora queda fijo, pero que RRHH lo contactará si es necesario ajustar.
-   - NO inventes que lo has cambiado.
-3. Si pide volver a postular:
-   - Explica que ya tiene una postulación registrada.
-4. NO des detalles técnicos ni menciones "JSON".
+1. SIEMPRE responde directamente a lo que el usuario pregunta ANTES de dar información adicional. Si hace una pregunta cerrada ("¿eso es todo?", "¿ya terminé?"), responde primero esa pregunta y luego complementa.
+2. Usa el CONTEXTO DEL CANDIDATO para dar información precisa. Si la entrevista YA fue confirmada/agendada, NO digas "te contactaremos para agendar" ni "una vez que agendemos tu cita".
+3. Para dudas operativas que no conoces (almuerzo, vestimenta, estacionamiento, acompañantes, transporte), responde con honestidad: "Esos detalles te los brindará nuestro equipo de RRHH al confirmar tu asistencia" o similar.
+4. NO inventes información. NO cambies fechas ni horarios. NO menciones términos técnicos, JSON ni bases de datos.
+5. Tono cálido, breve y profesional. NO uses saludos como "¡Hola!" si el usuario no te está saludando, responde directamente a su pregunta.
+6. Si el usuario ya completó todo y no hay acciones pendientes, hazle saber que su proceso está en orden y puede escribir si tiene alguna duda.
+7. Si pide cambiar fecha/horario de entrevista, dile amablemente que por ahora queda la fecha asignada, pero que RRHH lo contactará si hay cambios.
+8. Si pregunta por temas completamente ajenos al proceso (matemáticas, clima, código, chistes), redirige educadamente: "Mi función es ayudarte con tu proceso de postulación. ¿Tienes alguna duda al respecto?"
 
 FORMATO DE RESPUESTA (JSON OBLIGATORIO):
 {{
-  "response": "tu respuesta en texto plano aquí"
+  "response": "tu respuesta aquí"
 }}
 """
         result = self._generate(prompt)
@@ -559,6 +603,10 @@ FORMATO DE RESPUESTA (JSON OBLIGATORIO):
             data = _safe_json_loads(result)
             if data and "response" in data:
                 return data["response"]
+            # Si el fallback (Pro) respondió sin JSON, usar el texto directo
+            clean = result.strip()
+            if not clean.startswith("{"):
+                return clean
         
         return (
             "Gracias por escribirnos. Tu información ya fue registrada. "
