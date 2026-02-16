@@ -420,10 +420,10 @@ class AIBot:
 
             # Chat libre post-postulación
             if self.gemini:
-                # Construir contexto rico para que Gemini tenga info precisa
+                # Construir contexto — separar estado vs datos de referencia
                 ctx_parts = []
                 if s.get("is_apto"):
-                    ctx_parts.append("Estado: APTO (Pre-aprobado).")
+                    ctx_parts.append("Estado del postulante: APTO (Pre-aprobado).")
                     fecha_iso = s["data"].get("fecha_entrevista")
                     confirmado = s["data"].get("confirmacion_asistencia")
                     if fecha_iso and confirmado:
@@ -433,18 +433,20 @@ class AIBot:
                             fecha_fmt = fecha_obj.strftime("%d/%m/%Y a las %H:%M")
                         except Exception:
                             fecha_fmt = fecha_iso
-                        ctx_parts.append(f"Entrevista CONFIRMADA para: {fecha_fmt}.")
-                        ctx_parts.append("Lugar de entrevista: Av. Prol. Huaylas 1720, Chorrillos.")
-                        ctx_parts.append("Documentos requeridos: DNI y CV impreso.")
-                        ctx_parts.append("Es un Full Day con exámenes médicos, pruebas físicas y evaluaciones psicológicas.")
+                        ctx_parts.append("")
+                        ctx_parts.append("DATOS DE REFERENCIA (usa SOLO cuando sea relevante a la pregunta):")
+                        ctx_parts.append(f"- Entrevista confirmada: {fecha_fmt}")
+                        ctx_parts.append("- Lugar: Av. Prol. Huaylas 1720, Chorrillos")
+                        ctx_parts.append("- Documentos: DNI y CV impreso")
+                        ctx_parts.append("- Tipo: Full Day (exámenes médicos, pruebas físicas, evaluaciones psicológicas)")
                     elif fecha_iso:
                         ctx_parts.append(f"Entrevista propuesta: {fecha_iso} (no confirmada por el postulante).")
                     else:
                         ctx_parts.append("Entrevista: pendiente de asignar.")
                 else:
-                    ctx_parts.append("Estado: NO APTO (Registrado para futura consideración).")
+                    ctx_parts.append("Estado del postulante: NO APTO (Registrado para futura consideración).")
 
-                ctx_parts.append(f"Fecha postulación: {s.get('completion_time')}")
+                ctx_parts.append(f"\nFecha postulación: {s.get('completion_time')}")
                 context_str = "\n".join(ctx_parts)
 
                 return self.gemini.respuesta_conversacional(text, context_str, self.company_info)
