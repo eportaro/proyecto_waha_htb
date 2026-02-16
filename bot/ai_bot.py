@@ -373,7 +373,7 @@ class AIBot:
     # ------------- Núcleo de procesamiento -------------
     def process(self, chat_id: str, text: str) -> str:
         if not text or not text.strip():
-            return "¿Me puedes escribir tu consulta o respuesta? ??"
+            return "¿Me puedes escribir tu consulta o respuesta? 😊"
 
         text = text.strip()
         text_norm = _norm_text(text)
@@ -382,7 +382,7 @@ class AIBot:
         # Comandos globales
         if text_norm in {"ayuda", "help", "menu"}:
             return (
-                "?? *Comandos:*\n"
+                "📋 *Comandos:*\n"
                 "• *empezar* — iniciar postulación\n"
                 "• *reiniciar* — reiniciar proceso\n"
                 "• *estado* — ver progreso"
@@ -396,7 +396,7 @@ class AIBot:
                 return self._ask_next(self.sessions[chat_id]) # Pregunta 1: Nombre
 
             return (
-                f"¡Hola! ?? Soy el asistente virtual de *{self.company_info['nombre']}*.\n"
+                f"¡Hola! 👋 Soy el asistente virtual de *{self.company_info['nombre']}*.\n"
                 "Para iniciar tu postulación, escribe *empezar* o *quiero postular*."
             )
 
@@ -436,13 +436,13 @@ class AIBot:
                 context_str = "\n".join(ctx_parts)
 
                 return self.gemini.respuesta_conversacional(text, context_str, self.company_info)
-            return "Gracias por tu interés. Ya tenemos tus datos registrados. ??"
+            return "Gracias por tu interés. Ya tenemos tus datos registrados. ✅"
 
         # Estado durante sesión
         if text_norm == "estado":
             step = s["step"]
             total = len(self.questions_flow)
-            return f"?? Progreso: paso {step} de {total} (aprox)."
+            return f"📊 Progreso: paso {step} de {total} (aprox)."
 
         if text_norm.startswith("reiniciar"):
             self._reset_session(chat_id)
@@ -460,7 +460,7 @@ class AIBot:
                 return self.gemini.respuesta_conversacional(
                     text, "Invita al usuario a escribir 'empezar' para postular.", self.company_info
                 )
-            return "Escribe *empezar* para iniciar tu postulación. ??"
+            return "Escribe *empezar* para iniciar tu postulación. 👋"
 
         # Procesar respuesta actual
         current_key = self.questions_flow[s["step"] - 1]
@@ -683,7 +683,7 @@ class AIBot:
 
         if key == "autorizacion_datos":
             msg = (
-                "?? *FORMATO DE CONSENTIMIENTO DE DATOS PERSONALES*\n\n"
+                "🔒 *FORMATO DE CONSENTIMIENTO DE DATOS PERSONALES*\n\n"
                 "Autorizo a HERMES TRANSPORTES BLINDADOS S.A. a tratar mis datos personales sensibles (antecedentes policiales, penales, judiciales, historial crediticio) "
                 "para evaluar mi idoneidad en el proceso de selección, y a conservar mi CV por 6 meses. "
                 "Puede ejercer sus derechos ARCO en protecciondatospersonales@hermes.com.pe.\n\n"
@@ -691,7 +691,7 @@ class AIBot:
             )
         elif key == "nombre":
             msg = (
-                "? Gracias. A continuación, iniciaremos un cuestionario de aprox. 20 preguntas como pre-entrevista de trabajo. "
+                "✅ Gracias. A continuación, iniciaremos un cuestionario de aprox. 20 preguntas como pre-entrevista de trabajo. "
                 "Por favor asegúrate de completarlas todas correctamente.\n\n"
                 "1) Por favor, indícame tus *Nombres* (sin apellidos)."
             )
@@ -746,7 +746,7 @@ class AIBot:
             s["data"]["propuesta_fecha"] = fecha_iso
 
             msg = (
-                "?? ¡Felicidades! Cumples con los requisitos preliminares.\n\n"
+                "🎉 ¡Felicidades! Cumples con los requisitos preliminares.\n\n"
                 f"Queremos invitarte a una evaluación presencial el día *{dia_esp} {fecha_fmt_short} a las 08:30 AM*.\n"
                 "Será un *Full Day* donde realizaremos exámenes médicos, pruebas físicas y evaluaciones psicológicas.\n\n"
                 "¿Nos confirmas tu asistencia? (Sí / No)"
@@ -779,20 +779,20 @@ class AIBot:
                     fecha_fmt = "la fecha indicada"
 
                 final_msg = (
-                    f"? ¡Excelente! Tu entrevista ha sido agendada para el *{fecha_fmt}*.\n"
-                    "Te esperamos en: *Av. Prol. Huaylas 1720, Chorrillos*.\n"
-                    "No olvides llevar tu DNI y CV impreso. ¡Éxitos! ??"
+                    f"🎉 ¡Excelente! Tu entrevista ha sido agendada para el *{fecha_fmt}*.\n"
+                    "📍 Te esperamos en: *Av. Prol. Huaylas 1720, Chorrillos*.\n"
+                    "No olvides llevar tu DNI y CV impreso. ¡Éxitos! 💪"
                 )
             else:
                 final_msg = (
-                    "Entendido. Lamentamos que no puedas asistir en este horario. ??\n"
+                    "Entendido. Lamentamos que no puedas asistir en este horario. 😊\n"
                     "Dejaremos tus datos registrados y te contactaremos si se abre otra fecha. ¡Gracias!"
                 )
         else:
             razones_txt = ", ".join(razones) if razones else "perfil no ajustado"
             # Mensaje suave de rechazo
             final_msg = (
-                "Muchas gracias por completar tu postulación. ??\n"
+                "Muchas gracias por completar tu postulación. ✅\n"
                 "Hemos registrado correctamente tu información.\n"
                 "Tu perfil será evaluado y considerado en los procesos correspondientes.\n"
                 "¡Gracias por tu interés en Hermes Transportes Blindados!"
@@ -819,7 +819,7 @@ class AIBot:
             if y is False:
                 # Si dice NO, terminamos la sesión (o manejamos rechazo)
                 # Por ahora retornamos False con mensaje de despedida/error
-                return False, {}, "Entendido. Sin tu consentimiento no podemos continuar con el proceso. Gracias por tu interés. ??"
+                return False, {}, "Entendido. Sin tu consentimiento no podemos continuar con el proceso. Gracias por tu interés. 🙏"
 
             return False, {}, "Por favor responde *Sí* o *Acepto* para continuar, o *No* para salir."
 
